@@ -26,6 +26,8 @@ dependencies:
 
   # 
   url_launcher:
+  menubar:
+    path: ../../../flutter/flutter-desktop-embedding/plugins/menubar
 
 dev_dependencies:
   flutter_test:

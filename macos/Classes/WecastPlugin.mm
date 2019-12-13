@@ -6,15 +6,24 @@
 
 #import "TCDSenderOCMac/TCDDefine.h"
 
-@implementation WecastPlugin
+@implementation WecastPlugin {
+    TCDEngineSender *_sender;
+    FlutterMethodChannel *_channel;
+}
 
-TCDEngineSender *_sender;
+- (instancetype)initWithChannel:(FlutterMethodChannel *)channel {
+  self = [super init];
+  if (self) {
+    _channel = channel;
+  }
+  return self;
+}
 
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
   FlutterMethodChannel* channel = [FlutterMethodChannel
       methodChannelWithName:@"wecast"
             binaryMessenger:[registrar messenger]];
-  WecastPlugin* instance = [[WecastPlugin alloc] init];
+  WecastPlugin* instance = [[WecastPlugin alloc] initWithChannel:channel];
   [registrar addMethodCallDelegate:instance channel:channel];
     
   // Debug
@@ -22,6 +31,7 @@ TCDEngineSender *_sender;
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
+  NSLog(@">>> call %@ %@", call.method, call.arguments);
   if ([@"getPlatformVersion" isEqualToString:call.method]) {
     result([@"macOS " stringByAppendingString:[[NSProcessInfo processInfo] operatingSystemVersionString]]);
   } else if ([@"init" isEqualToString:call.method]) {
@@ -48,7 +58,7 @@ TCDEngineSender *_sender;
       result(nil);
   } else if ([@"startCast" isEqualToString:call.method]) {
       TCDCastConfig *config = [[TCDCastConfig alloc] init];
-      config.pin = call.arguments[@"pin"];;
+      config.pin = call.arguments;
       [_sender startCast:config];
       result(nil);
   } else if ([@"stopCast" isEqualToString:call.method]) {
@@ -60,49 +70,83 @@ TCDEngineSender *_sender;
   } else if ([@"resumeCast" isEqualToString:call.method]) {
      [_sender pauseCast:false];
      result(nil);
+  } else if ([@"startNetCheck" isEqualToString:call.method]) {
+     [_sender startCheckNetwork];
+     result(nil);
   } else {
     result(FlutterMethodNotImplemented);
   }
 }
 
 
-- (void)onEngineStarted:(TCDError)code userInfo:(TCDUser *)selfInfo {}
+- (void)onEngineStarted:(TCDError)code userInfo:(TCDUser *)selfInfo {
+    [_channel invokeMethod:@"engineStarted" arguments:@(code)
+  // @{@"corpId": selfInfo.corpId, @"nick": selfInfo.nickName, @"uid":selfInfo.TCDUID}
+     ];
+}
 
-- (void)onCastStarted:(TCDError)code {}
+- (void)onCastStarted:(TCDError)code {
+    [_channel invokeMethod:@"castStarted" arguments:@(code)];
+}
 
-- (void)onCastStopped:(TCDError)reason {}
+- (void)onCastStopped:(TCDError)reason {
+    [_channel invokeMethod:@"castStopped" arguments:@(reason)];
+}
 
 - (void)onUserChanged:(TCDUserChangeType)changeType
            changeList:(NSMutableArray<TCDUser *> *)changeList
             totalList:(NSMutableArray<TCDUser *> *)totalList {}
 
-- (void)onCastAdded:(TCDError)code config:(TCDCastConfig *)config {}
+- (void)onCastAdded:(TCDError)code config:(TCDCastConfig *)config {
+    [_channel invokeMethod:@"castAdded" arguments:@(code)];
+}
 
-- (void)onCastStateChanged:(TCDError)code castState:(TCDCastState)castState {}
+- (void)onCastStateChanged:(TCDError)code castState:(TCDCastState)castState {
+    [_channel invokeMethod:@"castStateChanged" arguments:@(code)];
+}
 
-- (void)onAuthInfoExpired {}
+- (void)onAuthInfoExpired {
+    [_channel invokeMethod:@"authExpired" arguments:nil];
+}
 
+- (void)onExtendScreenModeChanged:(BOOL)extendMode {
+    [_channel invokeMethod:@"extendModeChanged" arguments:@(extendMode)];
+}
 
-- (void)onExtendScreenModeChanged:(BOOL)extendMode {}
+- (void)onNetStateChanged:(BOOL)disconnected {
+    [_channel invokeMethod:@"netStateChanged" arguments:@(disconnected)];
+}
 
-- (void)onNetStateChanged:(BOOL)disconnected {}
+- (void)onRecoveryNotify:(TCDRecoveryInfo *)info {
+    [_channel invokeMethod:@"recover" arguments:info.receiverTCDUID];
+}
 
-- (void)onRecoveryNotify:(TCDRecoveryInfo *)info {}
-
-- (void)onRecoveryComplete:(TCDError)code info:(TCDRecoveryInfo *)info {}
+- (void)onRecoveryComplete:(TCDError)code info:(TCDRecoveryInfo *)info {
+    [_channel invokeMethod:@"recovered" arguments:@(code)];
+}
 
 - (void)onNetworkCheckProgress:(NSString *)url
                    description:(NSString *)description
                       progress:(int)progress
-                     totalSize:(int)totalSize {}
+                     totalSize:(int)totalSize {
+    [_channel invokeMethod:@"netCheck" arguments:description];
+}
 
-- (void)onNetworkCheckFinish:(NSMutableArray<TCDPingTask *> *)item {}
+- (void)onNetworkCheckFinish:(NSMutableArray<TCDPingTask *> *)item {
+    [_channel invokeMethod:@"netChecked" arguments:nil];
+}
 
-- (void)onTipsUpdate:(NSString *)tips {}
+- (void)onTipsUpdate:(NSString *)tips {
+    [_channel invokeMethod:@"tip" arguments:tips];
+}
 
-- (void)onKickOut {}
+- (void)onKickOut {
+    [_channel invokeMethod:@"kickout" arguments:nil];
+}
 
-- (void)onStreamInfoUpdated {}
+- (void)onStreamInfoUpdated {
+    [_channel invokeMethod:@"stream" arguments:nil];
+}
 
 
 @end

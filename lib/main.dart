@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:menubar/menubar.dart';
 
 import 'wecast.dart';
 
@@ -47,6 +48,18 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void initPlugin() async {
+    await setApplicationMenu([
+      Submenu(label: "工具", children: [
+        MenuItem(
+            label: "网络检测",
+            onClicked: () async {
+              if (_wecast != null) {
+                await _wecast.startNetCheck();
+              }
+            }),
+      ])
+    ]);
+
     try {
       _wecast = await Wecast.init(Setting(
         privateUrl: 'http://117.122.223.243',
@@ -62,8 +75,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   final TextEditingController textController = TextEditingController();
+
   void _startCast() {
-    textController.value;
+    if (_wecast != null && textController.value.text.length == 6)
+      _wecast.startCast(textController.value.text).then((_) {});
   }
 
   @override
@@ -99,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     .apply(fontSizeDelta: 10),
               ),
               onSubmitted: (_) {
-                if (_.length == 6) _startCast();
+                _startCast();
               },
               inputFormatters: [
                 WhitelistingTextInputFormatter.digitsOnly,
@@ -118,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
               padding: EdgeInsets.symmetric(
                   horizontal: 20, // MediaQuery.of(context).size.width * 0.2,
                   vertical: 20),
-              onPressed: _startCast,
+              onPressed: _wecast ?? _startCast,
             ),
             Text(_error != null ? _error : ''),
           ],

@@ -27,14 +27,14 @@ class Setting {
 }
 
 class Wecast {
-  static const MethodChannel _channel = const MethodChannel('wecast');
-
   static Future<String> get platformVersion async {
-    return await _channel.invokeMethod('getPlatformVersion');
+    return await _instance._channel.invokeMethod('getPlatformVersion');
   }
 
+  static Wecast _instance = Wecast._();
+
   static Future<Wecast> init(Setting setting) async {
-    await _channel.invokeMethod<bool>('init', {
+    await _instance._channel.invokeMethod<bool>('init', {
       'extendScreen': setting.extendScreen,
       'captureAudio': setting.captureAudio,
       'corpId': setting.corpId,
@@ -42,8 +42,14 @@ class Wecast {
       'privateUrl': setting.privateUrl,
       'nickName': setting.nickName,
     });
-    return Wecast();
+    return _instance;
   }
+
+  Wecast._() {
+    _channel.setMethodCallHandler(_callback);
+  }
+
+  final MethodChannel _channel = const MethodChannel('wecast');
 
   Future<void> startCast(String pin) async {
     return await _channel.invokeMethod<bool>('startCast', pin);
@@ -56,7 +62,17 @@ class Wecast {
   Future<void> pauseCast() async {
     return await _channel.invokeMethod<bool>('pauseCast');
   }
+
   Future<void> resumeCast() async {
     return await _channel.invokeMethod<bool>('resumeCast');
+  }
+
+  ///
+  Future<void> startNetCheck() async {
+    return await _channel.invokeMethod<bool>('startNetCheck');
+  }
+
+  Future<Null> _callback(MethodCall methodCall) async {
+    print('>>> ${methodCall.method} ${methodCall.arguments}');
   }
 }
