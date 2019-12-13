@@ -62,16 +62,23 @@ class _MyHomePageState extends State<MyHomePage> {
     ]);
 
     try {
-      _wecast = await Wecast.init(Setting(
-        privateUrl: 'http://117.122.223.243',
-        corpId: '1497349707',
-        corpAuth: kPublicKey,
-        nickName: 'fpall',
-      ));
-    } catch (error) {
-      setState(() {
-        _error = error.toString();
+      _wecast = await Wecast.init(
+          Setting(
+            privateUrl: 'http://117.122.223.243',
+            corpId: '1497349707',
+            corpAuth: kPublicKey,
+            nickName: 'fpall', // TODO: mac/ip or hostname
+          ), (String error) {
+        if (mounted)
+          setState(() {
+            _error = error;
+          });
       });
+    } catch (error) {
+      if (mounted)
+        setState(() {
+          _error = error.toString();
+        });
     }
   }
 
@@ -100,6 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 50),
               child: TextField(
+                autofocus: true,
                 showCursor: true,
                 controller: textController,
                 maxLength: 6,
@@ -139,7 +147,13 @@ class _MyHomePageState extends State<MyHomePage> {
               padding: EdgeInsets.symmetric(horizontal: 50),
               onPressed: _wecast != null ? _startCast : null,
             ),
-            Text(_error != null ? _error : ''),
+            SizedBox(height: 40),
+            if (_error != null)
+              SelectableText(_error,
+                  style: Theme.of(context)
+                      .textTheme
+                      .caption
+                      .apply(color: Colors.redAccent)),
           ],
         ),
       ),
