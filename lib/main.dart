@@ -11,6 +11,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -84,8 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(title: Text(widget.title)),
-      backgroundColor: Colors.blue,
+      backgroundColor: Colors.blue[900],
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -94,33 +94,39 @@ class _MyHomePageState extends State<MyHomePage> {
                 style: Theme.of(context)
                     .textTheme
                     .display1
-                    .apply(color: Colors.white)),
+                    .apply(color: Colors.white70)),
             SizedBox(height: 20),
             //
-            TextField(
-              controller: textController,
-              maxLength: 6,
-              textAlign: TextAlign.center,
-              style: Theme.of(context)
-                  .textTheme
-                  .display3
-                  .apply(color: Colors.white),
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: '投屏码(数字)',
-                hintStyle: Theme.of(context)
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 50),
+              child: TextField(
+                showCursor: true,
+                controller: textController,
+                maxLength: 6,
+                textAlign: TextAlign.center,
+                style: Theme.of(context)
                     .textTheme
-                    .caption
-                    .apply(fontSizeDelta: 10),
+                    .display3
+                    .copyWith(color: Colors.white, letterSpacing: 12),
+                decoration: InputDecoration(
+                  border: const UnderlineInputBorder(),
+                  // hintText: '投屏码(数字)',
+                  // helperText: 'Hello',
+                  counterText: '',
+                  hintStyle: Theme.of(context)
+                      .textTheme
+                      .caption
+                      .apply(fontSizeDelta: 10),
+                ),
+                onSubmitted: (_) {
+                  _startCast();
+                },
+                inputFormatters: [
+                  WhitelistingTextInputFormatter.digitsOnly,
+                ],
               ),
-              onSubmitted: (_) {
-                _startCast();
-              },
-              inputFormatters: [
-                WhitelistingTextInputFormatter.digitsOnly,
-              ],
             ),
-            Divider(color: Colors.white),
+            // Divider(color: Colors.white),
             SizedBox(height: 40),
             //
             RaisedButton(
@@ -130,10 +136,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       .title
                       .apply(color: Colors.blue)),
               // textColor: ,
-              padding: EdgeInsets.symmetric(
-                  horizontal: 20, // MediaQuery.of(context).size.width * 0.2,
-                  vertical: 20),
-              onPressed: _wecast ?? _startCast,
+              padding: EdgeInsets.symmetric(horizontal: 50),
+              onPressed: _wecast != null ? _startCast : null,
             ),
             Text(_error != null ? _error : ''),
           ],
