@@ -1,0 +1,6 @@
+framework module TCDSenderOCMac {
+  umbrella header "TCDSenderOCMac.h"
+
+  export *
+  module * { export * }
+}

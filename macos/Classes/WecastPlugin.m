@@ -2,6 +2,10 @@
 #import "WecastPlugin.h"
 
 // #import "TCDDefine.h"
+#import "xcast/xcast.h"
+
+#import "TCDSenderOCMac/TCDDefine.h"
+#import "TCDSenderOCMac/TCDEngineSender.h"
 
 @implementation WecastPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
@@ -10,6 +14,9 @@
             binaryMessenger:[registrar messenger]];
   WecastPlugin* instance = [[WecastPlugin alloc] init];
   [registrar addMethodCallDelegate:instance channel:channel];
+    
+  // Debug
+  NSLog(@"cast version: %s", xcast_version());
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {

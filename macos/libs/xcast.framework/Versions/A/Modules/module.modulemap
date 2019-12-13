@@ -1,0 +1,6 @@
+framework module xcast {
+  umbrella header "xcast.h"
+
+  export *
+  module * { export * }
+}

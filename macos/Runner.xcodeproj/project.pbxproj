@@ -32,6 +32,11 @@
 		D73912F022F37F9E000D13A0 /* App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D73912EF22F37F9E000D13A0 /* App.framework */; };
 		D73912F222F3801D000D13A0 /* App.framework in Bundle Framework */ = {isa = PBXBuildFile; fileRef = D73912EF22F37F9E000D13A0 /* App.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E8559B9023A3A4E0001870B4 /* WecastPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = E8559B8F23A3A4E0001870B4 /* WecastPlugin.m */; };
+		E855AB4423A3ADCE001870B4 /* xcast.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E855AB4323A3ADCE001870B4 /* xcast.framework */; };
+		E855AB4523A3ADCE001870B4 /* xcast.framework in Bundle Framework */ = {isa = PBXBuildFile; fileRef = E855AB4323A3ADCE001870B4 /* xcast.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		E855AB4723A3AF0F001870B4 /* tcd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E855AB4623A3AF0E001870B4 /* tcd.framework */; };
+		E855AB4823A3AF0F001870B4 /* tcd.framework in Bundle Framework */ = {isa = PBXBuildFile; fileRef = E855AB4623A3AF0E001870B4 /* tcd.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		E855AB4A23A3AF19001870B4 /* TCDSenderOCMac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E855AB4923A3AF19001870B4 /* TCDSenderOCMac.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -93,6 +98,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				E855AB4823A3AF0F001870B4 /* tcd.framework in Bundle Framework */,
+				E855AB4523A3ADCE001870B4 /* xcast.framework in Bundle Framework */,
 				D73912F222F3801D000D13A0 /* App.framework in Bundle Framework */,
 				33D1A10522148B93006C7A3E /* FlutterMacOS.framework in Bundle Framework */,
 			);
@@ -126,7 +133,6 @@
 		E8559B8D23A3A4E0001870B4 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		E8559B8E23A3A4E0001870B4 /* WecastPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WecastPlugin.h; path = Classes/WecastPlugin.h; sourceTree = "<group>"; };
 		E8559B8F23A3A4E0001870B4 /* WecastPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WecastPlugin.m; path = Classes/WecastPlugin.m; sourceTree = "<group>"; };
-		E8559B9223A3AC72001870B4 /* tcd.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = tcd.framework; path = "../../SDK-ALL/SDK-20191210/TencentCloudDisplaySDK_Sender_macOS_2.2.4.38/libs/tcd.framework"; sourceTree = "<group>"; };
 		E8559B9623A3AC7D001870B4 /* Runner.xcworkspace */ = {isa = PBXFileReference; lastKnownFileType = wrapper.workspace; path = Runner.xcworkspace; sourceTree = "<group>"; };
 		E8559B9723A3AC7D001870B4 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		E8559B9923A3AC7D001870B4 /* WecastPlugin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WecastPlugin.h; sourceTree = "<group>"; };
@@ -2925,8 +2931,9 @@
 		E855AB2423A3AC89001870B4 /* CoreMedia-1NMMGWTJBRQLM.swiftmodule */ = {isa = PBXFileReference; lastKnownFileType = text; path = "CoreMedia-1NMMGWTJBRQLM.swiftmodule"; sourceTree = "<group>"; };
 		E855AB2523A3AC89001870B4 /* Swift-Q5SZMM74NZR2.swiftmodule */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Swift-Q5SZMM74NZR2.swiftmodule"; sourceTree = "<group>"; };
 		E855AB2623A3AC89001870B4 /* Podfile.lock */ = {isa = PBXFileReference; lastKnownFileType = text; path = Podfile.lock; sourceTree = "<group>"; };
-		E855AB3D23A3ACA0001870B4 /* TCDSenderOCMac.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TCDSenderOCMac.framework; path = "../../SDK-ALL/SDK-20191210/TencentCloudDisplaySDK_Sender_macOS_2.2.4.38/libs/TCDSenderOCMac.framework"; sourceTree = "<group>"; };
-		E855AB4023A3ACB1001870B4 /* xcast.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = xcast.framework; path = "../../SDK-ALL/SDK-20191210/TencentCloudDisplaySDK_Sender_macOS_2.2.4.38/libs/xcast.framework"; sourceTree = "<group>"; };
+		E855AB4323A3ADCE001870B4 /* xcast.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = xcast.framework; path = libs/xcast.framework; sourceTree = "<group>"; };
+		E855AB4623A3AF0E001870B4 /* tcd.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = tcd.framework; path = libs/tcd.framework; sourceTree = "<group>"; };
+		E855AB4923A3AF19001870B4 /* TCDSenderOCMac.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TCDSenderOCMac.framework; path = libs/TCDSenderOCMac.framework; sourceTree = "<group>"; };
 		F8757B3DB385C9E48CC4EE57 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -2936,7 +2943,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				D73912F022F37F9E000D13A0 /* App.framework in Frameworks */,
+				E855AB4A23A3AF19001870B4 /* TCDSenderOCMac.framework in Frameworks */,
+				E855AB4723A3AF0F001870B4 /* tcd.framework in Frameworks */,
 				33D1A10422148B71006C7A3E /* FlutterMacOS.framework in Frameworks */,
+				E855AB4423A3ADCE001870B4 /* xcast.framework in Frameworks */,
 				5D3B7A3EC3397CA1C4A0C497 /* Pods_Runner.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3026,10 +3036,10 @@
 		D73912EC22F37F3D000D13A0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				E855AB4023A3ACB1001870B4 /* xcast.framework */,
-				E855AB3D23A3ACA0001870B4 /* TCDSenderOCMac.framework */,
+				E855AB4923A3AF19001870B4 /* TCDSenderOCMac.framework */,
+				E855AB4623A3AF0E001870B4 /* tcd.framework */,
+				E855AB4323A3ADCE001870B4 /* xcast.framework */,
 				E8559B9523A3AC7D001870B4 /* macos */,
-				E8559B9223A3AC72001870B4 /* tcd.framework */,
 				F8757B3DB385C9E48CC4EE57 /* Pods_Runner.framework */,
 			);
 			name = Frameworks;
@@ -15618,6 +15628,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter/ephemeral",
+					"$(PROJECT_DIR)/libs",
 				);
 				INFOPLIST_FILE = Runner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -15749,6 +15760,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter/ephemeral",
+					"$(PROJECT_DIR)/libs",
 				);
 				INFOPLIST_FILE = Runner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -15774,6 +15786,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter/ephemeral",
+					"$(PROJECT_DIR)/libs",
 				);
 				INFOPLIST_FILE = Runner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
