@@ -9,6 +9,8 @@ class MainFlutterWindow: NSWindow {
     self.setFrame(windowFrame, display: true)
 
     RegisterGeneratedPlugins(registry: flutterViewController)
+    
+    WecastPlugin.register(with: flutterViewController.registrar(forPlugin: "wecast"))
 
     super.awakeFromNib()
   }
