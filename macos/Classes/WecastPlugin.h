@@ -1,5 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <FlutterMacOS/FlutterMacOS.h>
 
-@interface WecastPlugin : NSObject<FlutterPlugin>
+#import "TCDSenderOCMac/TCDEngineSender.h"
+
+@interface WecastPlugin : NSObject<FlutterPlugin, TCDSenderDelegate>
 @end

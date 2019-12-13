@@ -27,8 +27,17 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
+const String kPublicKey = "-----BEGIN PUBLIC KEY-----\n"
+    "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDFSgFlvSEXuj3KHntguiwtA/g9"
+    "FzVjOcRuCiHSr4Vi4cHULaFHFHKfIbDSLTYj8GCocA25c3CGaX2nI32adxXiR+rq"
+    "lZwMGb+jet3BS+sFMyOaAJ0DWJiJo4p8aaDiOmVH2eKIDqHB9GKRP2cw4V9o3Kie"
+    "JZkFRWQIONBaInx0vwIDAQAB\n"
+    "-----END PUBLIC KEY-----";
+
 class _MyHomePageState extends State<MyHomePage> {
-  String _platformVersion = 'Unknown';
+  Wecast _wecast;
+  // last error string
+  String _error;
 
   @override
   void initState() {
@@ -38,16 +47,18 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void initPlugin() async {
-    String version;
     try {
-      version = await Wecast.platformVersion;
+      _wecast = await Wecast.init(Setting(
+        privateUrl: 'http://117.122.223.243',
+        corpId: '1497349707',
+        corpAuth: kPublicKey,
+        nickName: 'fpall',
+      ));
     } catch (error) {
-      version = 'Failed to get platform version.';
+      setState(() {
+        _error = error.toString();
+      });
     }
-
-    setState(() {
-      _platformVersion = version;
-    });
   }
 
   final TextEditingController textController = TextEditingController();
@@ -98,7 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
             SizedBox(height: 40),
             //
             RaisedButton(
-              child: Text('开始投屏 $_platformVersion',
+              child: Text('开始投屏',
                   style: Theme.of(context)
                       .textTheme
                       .title
@@ -109,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   vertical: 20),
               onPressed: _startCast,
             ),
-            Text(''),
+            Text(_error != null ? _error : ''),
           ],
         ),
       ),

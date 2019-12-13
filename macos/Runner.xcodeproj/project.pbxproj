@@ -31,12 +31,13 @@
 		5D3B7A3EC3397CA1C4A0C497 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F8757B3DB385C9E48CC4EE57 /* Pods_Runner.framework */; };
 		D73912F022F37F9E000D13A0 /* App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D73912EF22F37F9E000D13A0 /* App.framework */; };
 		D73912F222F3801D000D13A0 /* App.framework in Bundle Framework */ = {isa = PBXBuildFile; fileRef = D73912EF22F37F9E000D13A0 /* App.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		E8559B9023A3A4E0001870B4 /* WecastPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = E8559B8F23A3A4E0001870B4 /* WecastPlugin.m */; };
 		E855AB4423A3ADCE001870B4 /* xcast.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E855AB4323A3ADCE001870B4 /* xcast.framework */; };
 		E855AB4523A3ADCE001870B4 /* xcast.framework in Bundle Framework */ = {isa = PBXBuildFile; fileRef = E855AB4323A3ADCE001870B4 /* xcast.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E855AB4723A3AF0F001870B4 /* tcd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E855AB4623A3AF0E001870B4 /* tcd.framework */; };
 		E855AB4823A3AF0F001870B4 /* tcd.framework in Bundle Framework */ = {isa = PBXBuildFile; fileRef = E855AB4623A3AF0E001870B4 /* tcd.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		E855AB4A23A3AF19001870B4 /* TCDSenderOCMac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E855AB4923A3AF19001870B4 /* TCDSenderOCMac.framework */; };
+		E855AB6823A3D211001870B4 /* TCDSenderOCMac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E855AB4923A3AF19001870B4 /* TCDSenderOCMac.framework */; };
+		E855AB6923A3D211001870B4 /* TCDSenderOCMac.framework in Bundle Framework */ = {isa = PBXBuildFile; fileRef = E855AB4923A3AF19001870B4 /* TCDSenderOCMac.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		E855AB7523A3D350001870B4 /* WecastPlugin.mm in Sources */ = {isa = PBXBuildFile; fileRef = E855AB7423A3D350001870B4 /* WecastPlugin.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -100,6 +101,7 @@
 			files = (
 				E855AB4823A3AF0F001870B4 /* tcd.framework in Bundle Framework */,
 				E855AB4523A3ADCE001870B4 /* xcast.framework in Bundle Framework */,
+				E855AB6923A3D211001870B4 /* TCDSenderOCMac.framework in Bundle Framework */,
 				D73912F222F3801D000D13A0 /* App.framework in Bundle Framework */,
 				33D1A10522148B93006C7A3E /* FlutterMacOS.framework in Bundle Framework */,
 			);
@@ -132,7 +134,6 @@
 		D73912EF22F37F9E000D13A0 /* App.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = App.framework; path = Flutter/ephemeral/App.framework; sourceTree = SOURCE_ROOT; };
 		E8559B8D23A3A4E0001870B4 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		E8559B8E23A3A4E0001870B4 /* WecastPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WecastPlugin.h; path = Classes/WecastPlugin.h; sourceTree = "<group>"; };
-		E8559B8F23A3A4E0001870B4 /* WecastPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WecastPlugin.m; path = Classes/WecastPlugin.m; sourceTree = "<group>"; };
 		E8559B9623A3AC7D001870B4 /* Runner.xcworkspace */ = {isa = PBXFileReference; lastKnownFileType = wrapper.workspace; path = Runner.xcworkspace; sourceTree = "<group>"; };
 		E8559B9723A3AC7D001870B4 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		E8559B9923A3AC7D001870B4 /* WecastPlugin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WecastPlugin.h; sourceTree = "<group>"; };
@@ -2934,6 +2935,7 @@
 		E855AB4323A3ADCE001870B4 /* xcast.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = xcast.framework; path = libs/xcast.framework; sourceTree = "<group>"; };
 		E855AB4623A3AF0E001870B4 /* tcd.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = tcd.framework; path = libs/tcd.framework; sourceTree = "<group>"; };
 		E855AB4923A3AF19001870B4 /* TCDSenderOCMac.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TCDSenderOCMac.framework; path = libs/TCDSenderOCMac.framework; sourceTree = "<group>"; };
+		E855AB7423A3D350001870B4 /* WecastPlugin.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = WecastPlugin.mm; path = Classes/WecastPlugin.mm; sourceTree = "<group>"; };
 		F8757B3DB385C9E48CC4EE57 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -2943,7 +2945,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D73912F022F37F9E000D13A0 /* App.framework in Frameworks */,
-				E855AB4A23A3AF19001870B4 /* TCDSenderOCMac.framework in Frameworks */,
+				E855AB6823A3D211001870B4 /* TCDSenderOCMac.framework in Frameworks */,
 				E855AB4723A3AF0F001870B4 /* tcd.framework in Frameworks */,
 				33D1A10422148B71006C7A3E /* FlutterMacOS.framework in Frameworks */,
 				E855AB4423A3ADCE001870B4 /* xcast.framework in Frameworks */,
@@ -3049,7 +3051,7 @@
 			isa = PBXGroup;
 			children = (
 				E8559B8E23A3A4E0001870B4 /* WecastPlugin.h */,
-				E8559B8F23A3A4E0001870B4 /* WecastPlugin.m */,
+				E855AB7423A3D350001870B4 /* WecastPlugin.mm */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -15479,7 +15481,7 @@
 				33CC11132044BFA00003C045 /* MainFlutterWindow.swift in Sources */,
 				33CC10F12044A3C60003C045 /* AppDelegate.swift in Sources */,
 				335BBD1B22A9A15E00E9071D /* GeneratedPluginRegistrant.swift in Sources */,
-				E8559B9023A3A4E0001870B4 /* WecastPlugin.m in Sources */,
+				E855AB7523A3D350001870B4 /* WecastPlugin.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
