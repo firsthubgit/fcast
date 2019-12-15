@@ -1,6 +1,9 @@
 # pall
 
-A new Flutter project.
+odd * 3 +1
+even / 2
+1
+
 
 ## Getting Started
 

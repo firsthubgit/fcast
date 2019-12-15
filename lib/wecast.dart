@@ -26,7 +26,17 @@ class Setting {
   final String privateUrl;
 }
 
+enum CastState {
+  stateNone,
+
+  /// 暂停操作进行中（触发了暂停但还未请求完成）
+  statePauseOperating,
+  stateCasting,
+  statePaused,
+}
+
 typedef ErrorHandle = void Function(String);
+typedef StateChange = void Function(CastState);
 
 class Wecast {
   static Future<String> get platformVersion async {
@@ -37,9 +47,13 @@ class Wecast {
 
   static Wecast _instance;
 
-  static Future<Wecast> init(Setting setting, ErrorHandle errorHandle) async {
+  static Future<Wecast> init(
+    Setting setting,
+    ErrorHandle errorHandle,
+    StateChange stateChange,
+  ) async {
     assert(_instance == null);
-    _instance = Wecast._(errorHandle);
+    _instance = Wecast._(errorHandle, stateChange);
 
     await _instance._channel.invokeMethod<bool>('init', {
       'extendScreen': setting.extendScreen,
@@ -52,12 +66,17 @@ class Wecast {
     return _instance;
   }
 
-  Wecast._(this.errorHandle) {
+  Wecast._(this.errorHandle, this.stateChange) {
     _channel.setMethodCallHandler(_callback);
   }
 
   final MethodChannel _channel = const MethodChannel('wecast');
   final ErrorHandle errorHandle;
+  final StateChange stateChange;
+
+  CastState _state = CastState.stateNone;
+
+  CastState get state => _state;
 
   Future<void> startCast(String pin) async {
     return await _channel.invokeMethod<bool>('startCast', pin);
@@ -92,6 +111,16 @@ class Wecast {
 
     if (errorHandle != null && normalCoded.contains(method.method)) {
       errorHandle(error(method.arguments));
+    }
+
+    // if (method.method == 'castStarted')
+    //   _state = CastState.stateCasting;
+    // else if (method.method == 'castStopped')
+    //   _state = CastState.stateNone;
+    // else
+    if (method.method == 'castStateChanged') {
+      _state = method.arguments;
+      stateChange(_state);
     }
   }
 
