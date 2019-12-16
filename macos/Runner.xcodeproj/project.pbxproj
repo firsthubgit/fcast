@@ -98,6 +98,13 @@
 			remoteGlobalIDString = B7B297B8CD3C73BF357A11CE7CD7D440;
 			remoteInfo = menubar;
 		};
+		E8B62DC823A72EE400016C91 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8559D4123A3AC7D001870B4 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 62DF2A302FEE5D109ED984BAD8ABFE7A;
+			remoteInfo = shared_preferences_macos;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -4668,6 +4675,7 @@
 			children = (
 				E8B62DAD23A7182700016C91 /* menubar.framework */,
 				E855AB2C23A3AC8A001870B4 /* Pods_Runner.framework */,
+				E8B62DC923A72EE400016C91 /* shared_preferences_macos.framework */,
 				E855AB2E23A3AC8A001870B4 /* url_launcher_macos.framework */,
 			);
 			name = Products;
@@ -15398,6 +15406,13 @@
 			fileType = wrapper.framework;
 			path = menubar.framework;
 			remoteRef = E8B62DAC23A7182700016C91 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		E8B62DC923A72EE400016C91 /* shared_preferences_macos.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = shared_preferences_macos.framework;
+			remoteRef = E8B62DC823A72EE400016C91 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
