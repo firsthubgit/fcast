@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:menubar/menubar.dart';
@@ -58,6 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void initPlugin() async {
+    // HttpClient
     await setApplicationMenu([
       Submenu(label: "工具", children: [
         MenuItem(
@@ -75,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Setting(
             privateUrl: 'http://117.122.223.243',
             corpId: '1497349707',
-            corpAuth: kPublicKey,
+            publicKey: kPublicKey,
             nickName: 'fpall', // TODO: mac/ip or hostname
           ), (String error) {
         if (mounted)

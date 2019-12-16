@@ -2,26 +2,30 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
+import 'rsa_encrypt.dart';
+
 class Setting {
   Setting({
+    this.publicKey,
     this.captureAudio: false,
     this.extendScreen: true,
     this.mirror: false,
     this.corpId,
-    this.corpAuth,
     this.nickName,
     this.privateUrl,
-  })  : assert(corpId != null),
-        assert(corpAuth != null),
+  })  : assert(publicKey != null),
+        assert(corpId != null),
         assert(nickName != null),
         assert(privateUrl != null);
+
+  final String publicKey;
 
   final bool captureAudio;
   final bool extendScreen;
   final bool mirror;
 
   final String corpId;
-  final String corpAuth;
+
   final String nickName;
   final String privateUrl;
 }
@@ -59,11 +63,18 @@ class Wecast {
       'extendScreen': setting.extendScreen,
       'captureAudio': setting.captureAudio,
       'corpId': setting.corpId,
-      'corpAuth': setting.corpAuth,
+      'corpAuth': genCorpAuth(setting),
       'privateUrl': setting.privateUrl,
       'nickName': setting.nickName,
     });
     return _instance;
+  }
+
+  static String genCorpAuth(Setting setting) {
+    return encryptWith(setting.publicKey, {
+      'corpid': setting.corpId,
+      'timestamp': '${DateTime.now().millisecondsSinceEpoch/1000}',
+    });
   }
 
   Wecast._(this.errorHandle, this.stateChange) {
