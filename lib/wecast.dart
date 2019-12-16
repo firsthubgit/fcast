@@ -100,14 +100,14 @@ class Wecast {
   }
 
   Future<Null> _callback(MethodCall method) async {
+    // 回调参数为错误码的函数
     final List normalCoded = <String>[
       'engineStarted',
     ];
 
     print('>>> callback: ${method.method} ${method.arguments} '
         '${method.arguments.runtimeType} '
-        '${errorHandle != null && normalCoded.contains(method.method)} '
-        '$errorHandle');
+        '${errorHandle != null && normalCoded.contains(method.method)}');
 
     if (errorHandle != null && normalCoded.contains(method.method)) {
       errorHandle(error(method.arguments));

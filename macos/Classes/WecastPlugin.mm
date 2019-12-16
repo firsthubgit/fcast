@@ -83,10 +83,7 @@
 
 - (void)onEngineStarted:(TCDError)code userInfo:(TCDUser *)selfInfo {
   [_channel invokeMethod:@"engineStarted"
-               arguments:@(code)
-      // @{@"corpId": selfInfo.corpId, @"nick": selfInfo.nickName,
-      // @"uid":selfInfo.TCDUID}
-  ];
+               arguments:@(code)];
 }
 
 - (void)onCastStarted:(TCDError)code {

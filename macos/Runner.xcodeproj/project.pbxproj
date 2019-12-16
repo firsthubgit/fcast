@@ -38,6 +38,7 @@
 		E855AB6823A3D211001870B4 /* TCDSenderOCMac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E855AB4923A3AF19001870B4 /* TCDSenderOCMac.framework */; };
 		E855AB6923A3D211001870B4 /* TCDSenderOCMac.framework in Bundle Framework */ = {isa = PBXBuildFile; fileRef = E855AB4923A3AF19001870B4 /* TCDSenderOCMac.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E855AB7523A3D350001870B4 /* WecastPlugin.mm in Sources */ = {isa = PBXBuildFile; fileRef = E855AB7423A3D350001870B4 /* WecastPlugin.mm */; };
+		E8B62DB423A7182700016C91 /* wecast.conf in Resources */ = {isa = PBXBuildFile; fileRef = E8B62DA623A7182700016C91 /* wecast.conf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -89,6 +90,13 @@
 			proxyType = 2;
 			remoteGlobalIDString = 97C146EE1CF9000F007C117D;
 			remoteInfo = Runner;
+		};
+		E8B62DAC23A7182700016C91 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8559D4123A3AC7D001870B4 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B7B297B8CD3C73BF357A11CE7CD7D440;
+			remoteInfo = menubar;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -2936,6 +2944,7 @@
 		E855AB4623A3AF0E001870B4 /* tcd.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = tcd.framework; path = libs/tcd.framework; sourceTree = "<group>"; };
 		E855AB4923A3AF19001870B4 /* TCDSenderOCMac.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TCDSenderOCMac.framework; path = libs/TCDSenderOCMac.framework; sourceTree = "<group>"; };
 		E855AB7423A3D350001870B4 /* WecastPlugin.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = WecastPlugin.mm; path = Classes/WecastPlugin.mm; sourceTree = "<group>"; };
+		E8B62DA623A7182700016C91 /* wecast.conf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = wecast.conf; path = ../Resources/wecast.conf; sourceTree = "<group>"; };
 		F8757B3DB385C9E48CC4EE57 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -3015,6 +3024,7 @@
 		33FAB671232836740065AC1E /* Runner */ = {
 			isa = PBXGroup;
 			children = (
+				E8B62DA623A7182700016C91 /* wecast.conf */,
 				33CC10F02044A3C60003C045 /* AppDelegate.swift */,
 				33CC11122044BFA00003C045 /* MainFlutterWindow.swift */,
 				33E51913231747F40026EE4D /* DebugProfile.entitlements */,
@@ -4656,6 +4666,7 @@
 		E8559D4223A3AC7D001870B4 /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				E8B62DAD23A7182700016C91 /* menubar.framework */,
 				E855AB2C23A3AC8A001870B4 /* Pods_Runner.framework */,
 				E855AB2E23A3AC8A001870B4 /* url_launcher_macos.framework */,
 			);
@@ -15382,6 +15393,13 @@
 			remoteRef = E855AB3B23A3AC8A001870B4 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		E8B62DAD23A7182700016C91 /* menubar.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = menubar.framework;
+			remoteRef = E8B62DAC23A7182700016C91 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -15390,6 +15408,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				33CC10F32044A3C60003C045 /* Assets.xcassets in Resources */,
+				E8B62DB423A7182700016C91 /* wecast.conf in Resources */,
 				33CC10F62044A3C60003C045 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

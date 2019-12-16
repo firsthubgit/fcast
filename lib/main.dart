@@ -162,11 +162,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   SizedBox(height: 40),
                   if (_error != null)
-                    SelectableText(_error,
-                        style: Theme.of(context)
-                            .textTheme
-                            .caption
-                            .apply(color: Colors.redAccent)),
+                    SelectableText(
+                      _error,
+                      style: Theme.of(context)
+                          .textTheme
+                          .caption
+                          .apply(color: Colors.redAccent),
+                    ),
                 ],
               ),
       ),
