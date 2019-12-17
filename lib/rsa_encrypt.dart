@@ -28,7 +28,7 @@ RSAPublicKey parsePublicKey(String pem) {
   return RSAPublicKey(modulus, exponent);
 }
 
-String encryptWith(String publicKey, Map plain) {
+String rsaEncryptWith(String publicKey, Map plain) {
   RSAPublicKey pk = parsePublicKey(publicKey);
 
   var cipher = AsymmetricBlockCipher('RSA/PKCS1');
@@ -45,6 +45,6 @@ void main() {
     'corpid': '1497349707',
     'timestamp': '1576477827',
   };
-  String result = encryptWith(kPublicKey, map);
+  String result = rsaEncryptWith(kPublicKey, map);
   print(result);
 }

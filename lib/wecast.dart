@@ -19,13 +19,10 @@ class Setting {
         assert(privateUrl != null);
 
   final String publicKey;
-
   final bool captureAudio;
   final bool extendScreen;
   final bool mirror;
-
   final String corpId;
-
   final String nickName;
   final String privateUrl;
 }
@@ -39,7 +36,7 @@ enum CastState {
   statePaused,
 }
 
-typedef ErrorHandle = void Function(String);
+typedef ErrorHandle = void Function(int, String);
 typedef StateChange = void Function(CastState);
 
 class Wecast {
@@ -59,7 +56,7 @@ class Wecast {
     assert(_instance == null);
     _instance = Wecast._(errorHandle, stateChange);
 
-    await _instance._channel.invokeMethod<bool>('init', {
+    _instance._channel.invokeMethod<void>('init', {
       'extendScreen': setting.extendScreen,
       'captureAudio': setting.captureAudio,
       'corpId': setting.corpId,
@@ -71,9 +68,9 @@ class Wecast {
   }
 
   static String genCorpAuth(Setting setting) {
-    return encryptWith(setting.publicKey, {
+    return rsaEncryptWith(setting.publicKey, {
       'corpid': setting.corpId,
-      'timestamp': '${DateTime.now().millisecondsSinceEpoch/1000}',
+      'timestamp': '${DateTime.now().millisecondsSinceEpoch / 1000}',
     });
   }
 
@@ -89,47 +86,61 @@ class Wecast {
 
   CastState get state => _state;
 
+  Future<bool> queryPermission() async {
+    return await _channel.invokeMethod<bool>('queryPermission');
+  }
+
   Future<void> startCast(String pin) async {
-    return await _channel.invokeMethod<bool>('startCast', pin);
+    await _channel.invokeMethod<void>('startCast', pin);
   }
 
   Future<void> stopCast() async {
-    return await _channel.invokeMethod<bool>('stopCast');
+    await _channel.invokeMethod<void>('stopCast');
   }
 
   Future<void> pauseCast() async {
-    return await _channel.invokeMethod<bool>('pauseCast');
+    await _channel.invokeMethod<void>('pauseCast');
   }
 
   Future<void> resumeCast() async {
-    return await _channel.invokeMethod<bool>('resumeCast');
+    await _channel.invokeMethod<void>('resumeCast');
   }
 
   ///
   Future<void> startNetCheck() async {
-    return await _channel.invokeMethod<bool>('startNetCheck');
+    await _channel.invokeMethod<void>('startNetCheck');
+  }
+
+  Future<void> shutdown() async {
+    await _channel.invokeMethod<void>('shutdown');
   }
 
   Future<Null> _callback(MethodCall method) async {
     // 回调参数为错误码的函数
-    final List normalCoded = <String>[
+    final List codedMethod = <String>[
       'engineStarted',
+      'castStopped',
+      'castAdded',
+      'recovered',
+      'castStarted',
     ];
 
     print('>>> callback: ${method.method} ${method.arguments} '
         '${method.arguments.runtimeType} '
-        '${errorHandle != null && normalCoded.contains(method.method)}');
+        '${errorHandle != null && codedMethod.contains(method.method)}');
 
-    if (errorHandle != null && normalCoded.contains(method.method)) {
-      errorHandle(error(method.arguments));
+    if (errorHandle != null && codedMethod.contains(method.method)) {
+      errorHandle(method.arguments, error(method.arguments));
     }
+
+    final List stateMethod = <String>['castStateChanged'];
 
     // if (method.method == 'castStarted')
     //   _state = CastState.stateCasting;
     // else if (method.method == 'castStopped')
     //   _state = CastState.stateNone;
     // else
-    if (method.method == 'castStateChanged') {
+    if (stateMethod.contains(method.method)) {
       _state = method.arguments;
       stateChange(_state);
     }

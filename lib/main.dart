@@ -42,7 +42,9 @@ const String kPublicKey = "-----BEGIN PUBLIC KEY-----\n"
 class _MyHomePageState extends State<MyHomePage> {
   Wecast _wecast;
   // last error string
+  int _code = 0;
   String _error;
+  CastState _castState = CastState.stateNone;
 
   final TextEditingController textController = TextEditingController();
 
@@ -58,6 +60,14 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
 
     initPlugin();
+  }
+
+  @override
+  void dispose() {
+    if (_wecast != null) {
+      _wecast.shutdown();
+    }
+    super.dispose();
   }
 
   void initPlugin() async {
@@ -81,17 +91,21 @@ class _MyHomePageState extends State<MyHomePage> {
             corpId: '1497349707',
             publicKey: kPublicKey,
             nickName: 'fpall', // TODO: mac/ip or hostname
-          ), (String error) {
+          ), (int code, String error) {
         if (mounted)
           setState(() {
+            _code = code;
             _error = error;
           });
       }, (state) {
-        setState(() {});
+        setState(() {
+          _castState = state;
+        });
       });
     } catch (error) {
       if (mounted)
         setState(() {
+          _code = -1;
           _error = error.toString();
         });
     }
@@ -165,7 +179,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     onPressed: _startCast,
                   ),
                   SizedBox(height: 40),
-                  if (_error != null)
+                  if (_code != 0 && _error != null)
                     SelectableText(
                       _error,
                       style: Theme.of(context)
