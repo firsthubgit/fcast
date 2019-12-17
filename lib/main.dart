@@ -71,6 +71,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void initPlugin() async {
+    bool res = await Wecast.queryPermission();
+    print('queryPermission $res');
+
     // HttpClient
     await setApplicationMenu([
       Submenu(label: "工具", children: [
@@ -168,7 +171,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   //
                   RaisedButton(
                     child: Text(
-                      stateText[_wecast.state],
+                      stateText[_castState],
                       style: Theme.of(context)
                           .textTheme
                           .title

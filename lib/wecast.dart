@@ -41,11 +41,14 @@ typedef StateChange = void Function(CastState);
 
 class Wecast {
   static Future<String> get platformVersion async {
-    if (_instance == null) return null;
-
-    return await _instance._channel.invokeMethod('getPlatformVersion');
+    return await _channel.invokeMethod('getPlatformVersion');
   }
 
+  static Future<bool> queryPermission() async {
+    return await _channel.invokeMethod<bool>('queryPermission');
+  }
+
+  static const MethodChannel _channel = const MethodChannel('wecast');
   static Wecast _instance;
 
   static Future<Wecast> init(
@@ -54,16 +57,18 @@ class Wecast {
     StateChange stateChange,
   ) async {
     assert(_instance == null);
-    _instance = Wecast._(errorHandle, stateChange);
+    if (_instance == null) {
+      _instance = Wecast._(errorHandle, stateChange);
 
-    _instance._channel.invokeMethod<void>('init', {
-      'extendScreen': setting.extendScreen,
-      'captureAudio': setting.captureAudio,
-      'corpId': setting.corpId,
-      'corpAuth': genCorpAuth(setting),
-      'privateUrl': setting.privateUrl,
-      'nickName': setting.nickName,
-    });
+      _channel.invokeMethod<void>('init', {
+        'extendScreen': setting.extendScreen,
+        'captureAudio': setting.captureAudio,
+        'corpId': setting.corpId,
+        'corpAuth': genCorpAuth(setting),
+        'privateUrl': setting.privateUrl,
+        'nickName': setting.nickName,
+      });
+    }
     return _instance;
   }
 
@@ -78,17 +83,11 @@ class Wecast {
     _channel.setMethodCallHandler(_callback);
   }
 
-  final MethodChannel _channel = const MethodChannel('wecast');
   final ErrorHandle errorHandle;
   final StateChange stateChange;
 
   CastState _state = CastState.stateNone;
-
   CastState get state => _state;
-
-  Future<bool> queryPermission() async {
-    return await _channel.invokeMethod<bool>('queryPermission');
-  }
 
   Future<void> startCast(String pin) async {
     await _channel.invokeMethod<void>('startCast', pin);
@@ -113,6 +112,7 @@ class Wecast {
 
   Future<void> shutdown() async {
     await _channel.invokeMethod<void>('shutdown');
+    _channel.setMethodCallHandler(null);
   }
 
   Future<Null> _callback(MethodCall method) async {
