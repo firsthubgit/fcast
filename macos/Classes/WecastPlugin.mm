@@ -87,6 +87,17 @@
 }
 
 - (BOOL)queryPermission {
+  CGDisplayStreamRef stream = CGDisplayStreamCreate(CGMainDisplayID(), 1, 1, kCVPixelFormatType_32BGRA, nil, ^(CGDisplayStreamFrameStatus status, uint64_t displayTime, IOSurfaceRef frameSurface, CGDisplayStreamUpdateRef updateRef) {
+  });
+  if (stream) {
+    CFRelease(stream);
+    return YES;
+  }
+  return NO;
+
+  // copy from
+  // https://stackoverflow.com/a/57379206/620672
+  // not worked
   if (@available(macOS 10.15, *)) {
       CFArrayRef windowList = CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly, kCGNullWindowID);
       NSUInteger numberOfWindows = CFArrayGetCount(windowList);
