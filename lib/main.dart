@@ -40,6 +40,7 @@ const String kPublicKey = "-----BEGIN PUBLIC KEY-----\n"
     "-----END PUBLIC KEY-----";
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool _hasPermission = false;
   Wecast _wecast;
   // last error string
   int _code = 0;
@@ -70,12 +71,15 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
-  void initPlugin() async {
-    bool res = await Wecast.queryPermission();
-    print('queryPermission $res');
+  void initPlugin() {
+    Wecast.queryPermission().then((res) {
+      setState(() {
+        _hasPermission = res;
+      });
+    });
 
-    // HttpClient
-    await setApplicationMenu([
+    // menu
+    setApplicationMenu([
       Submenu(label: "工具", children: [
         MenuItem(
             label: "网络检测",
@@ -85,33 +89,33 @@ class _MyHomePageState extends State<MyHomePage> {
               }
             }),
       ])
-    ]);
+    ]).then((_) {});
 
-    try {
-      _wecast = await Wecast.init(
-          Setting(
-            privateUrl: 'http://117.122.223.243',
-            corpId: '1497349707',
-            publicKey: kPublicKey,
-            nickName: 'fpall', // TODO: mac/ip or hostname
-          ), (int code, String error) {
-        if (mounted)
-          setState(() {
-            _code = code;
-            _error = error;
-          });
-      }, (state) {
+    Wecast.init(
+        Setting(
+          privateUrl: 'http://117.122.223.243',
+          corpId: '1497349707',
+          publicKey: kPublicKey,
+          nickName: 'fpall', // TODO: mac/ip or hostname
+        ), (int code, String error) {
+      if (mounted)
         setState(() {
-          _castState = state;
+          _code = code;
+          _error = error;
         });
+    }, (state) {
+      setState(() {
+        _castState = state;
       });
-    } catch (error) {
+    }).then((instance) {
+      _wecast = instance;
+    }).catchError((error, stackTrac) {
       if (mounted)
         setState(() {
           _code = -1;
           _error = error.toString();
         });
-    }
+    });
   }
 
   void _startCast() {
@@ -124,74 +128,79 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       backgroundColor: Colors.blue[900],
       body: Center(
-        child: _wecast == null
-            ? Text('正在连接服务器...', style: Theme.of(context).textTheme.display1)
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text('方正投屏',
-                      style: Theme.of(context)
-                          .textTheme
-                          .display1
-                          .apply(color: Colors.white70)),
-                  SizedBox(height: 20),
-                  //
-                  Container(
-                    width: 300, //
-                    child: TextField(
-                      autofocus: true,
-                      showCursor: true,
-                      controller: textController,
-                      maxLength: 6,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context)
-                          .textTheme
-                          .display3
-                          .copyWith(color: Colors.white, letterSpacing: 12),
-                      decoration: InputDecoration(
-                        border: const UnderlineInputBorder(),
-                        // hintText: '投屏码(数字)',
-                        // helperText: 'Hello',
-                        counterText: '',
-                        hintStyle: Theme.of(context)
-                            .textTheme
-                            .caption
-                            .apply(fontSizeDelta: 10),
+        child:
+            // !_hasPermission
+            // ? Text('检查录屏权限', style: Theme.of(context).textTheme.display1)
+            // :
+            _wecast == null
+                ? Text('正在连接服务器...',
+                    style: Theme.of(context).textTheme.display1)
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text('方正投屏 $_hasPermission',
+                          style: Theme.of(context)
+                              .textTheme
+                              .display1
+                              .apply(color: Colors.white70)),
+                      SizedBox(height: 20),
+                      //
+                      Container(
+                        width: 300, //
+                        child: TextField(
+                          autofocus: true,
+                          showCursor: true,
+                          controller: textController,
+                          maxLength: 6,
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context)
+                              .textTheme
+                              .display3
+                              .copyWith(color: Colors.white, letterSpacing: 12),
+                          decoration: InputDecoration(
+                            border: const UnderlineInputBorder(),
+                            // hintText: '投屏码(数字)',
+                            // helperText: 'Hello',
+                            counterText: '',
+                            hintStyle: Theme.of(context)
+                                .textTheme
+                                .caption
+                                .apply(fontSizeDelta: 10),
+                          ),
+                          onSubmitted: (_) {
+                            _startCast();
+                          },
+                          inputFormatters: [
+                            WhitelistingTextInputFormatter.digitsOnly,
+                          ],
+                        ),
                       ),
-                      onSubmitted: (_) {
-                        _startCast();
-                      },
-                      inputFormatters: [
-                        WhitelistingTextInputFormatter.digitsOnly,
-                      ],
-                    ),
-                  ),
 
-                  SizedBox(height: 40),
-                  //
-                  RaisedButton(
-                    child: Text(
-                      stateText[_castState],
-                      style: Theme.of(context)
-                          .textTheme
-                          .title
-                          .apply(color: Colors.blue),
-                    ),
-                    // textColor: ,
-                    padding: EdgeInsets.symmetric(horizontal: 50),
-                    onPressed: _startCast,
+                      SizedBox(height: 40),
+                      //
+                      RaisedButton(
+                        child: Text(
+                          stateText[_castState],
+                          style: Theme.of(context)
+                              .textTheme
+                              .title
+                              .apply(color: Colors.blue),
+                        ),
+                        // textColor: ,
+                        padding: EdgeInsets.symmetric(horizontal: 50),
+                        onPressed: _startCast,
+                      ),
+                      SizedBox(height: 40),
+                      if (_code != 0 && _error != null)
+                        SelectableText(
+                          _error,
+                          style: Theme.of(context)
+                              .textTheme
+                              .caption
+                              .apply(color: Colors.redAccent),
+                        ),
+                    ],
                   ),
-                  SizedBox(height: 40),
-                  if (_code != 0 && _error != null)
-                    SelectableText(
-                      _error,
-                      style: Theme.of(context)
-                          .textTheme
-                          .caption
-                          .apply(color: Colors.redAccent),
-                    ),
-                ],
-              ),
       ),
     );
   }
