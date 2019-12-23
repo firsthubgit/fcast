@@ -1,10 +1,17 @@
 import Cocoa
+import AppKit
 import FlutterMacOS
 
 class MainFlutterWindow: NSWindow {
   override func awakeFromNib() {
     let flutterViewController = FlutterViewController.init()
-    let windowFrame = self.frame
+    var windowFrame = self.frame
+    
+    windowFrame.size = NSSize(width:400, height:367)
+    
+    super.styleMask.remove(NSWindow.StyleMask.resizable)
+    // super.styleMask.remove(NSWindow.StyleMask.titled)
+    
     self.contentViewController = flutterViewController
     self.setFrame(windowFrame, display: true)
 
