@@ -16,7 +16,8 @@ class Setting {
   })  : assert(publicKey != null),
         assert(corpId != null),
         assert(nickName != null),
-        assert(privateUrl != null);
+        assert(privateUrl != null),
+        assert(extendScreen != mirror);
 
   final String publicKey;
   final bool captureAudio;
@@ -90,33 +91,33 @@ class Wecast {
   CastState _state = CastState.stateNone;
   CastState get state => _state;
 
-  Future<void> startCast(String pin) async {
+  Future startCast(String pin) async {
     await _channel.invokeMethod<void>('startCast', pin);
   }
 
-  Future<void> stopCast() async {
+  Future stopCast() async {
     await _channel.invokeMethod<void>('stopCast');
   }
 
-  Future<void> pauseCast() async {
+  Future pauseCast() async {
     await _channel.invokeMethod<void>('pauseCast');
   }
 
-  Future<void> resumeCast() async {
+  Future resumeCast() async {
     await _channel.invokeMethod<void>('resumeCast');
   }
 
   ///
-  Future<void> startNetCheck() async {
+  Future startNetCheck() async {
     await _channel.invokeMethod<void>('startNetCheck');
   }
 
-  Future<void> shutdown() async {
+  Future shutdown() async {
     await _channel.invokeMethod<void>('shutdown');
     _channel.setMethodCallHandler(null);
   }
 
-  Future<Null> _callback(MethodCall method) async {
+  Future _callback(MethodCall method) async {
     // 回调参数为错误码的函数
     final List codedMethod = <String>[
       'engineStarted',
@@ -164,7 +165,20 @@ class Wecast {
       111: 'cdkey欠费',
       201: '建立投屏连接超时',
       202: '操作错误次数过多被限制',
-      301: '错误pin码'
+      301: '错误pin码',
+      80009: '心跳超时', // kTCDExitTimeout
+      80010: '邀请失败或超时退出', // kTCDExitByInviteFailed
+      80017: 'tv主动断开', // kTCDTvExit
+      80018: 'tv邀请超时(5s)', // kTCDTVNotEnter
+      80021: '合盖子退出', // kTCDBookCover
+      80022: 'app被终止', // kTCDTerminateApp
+      80023: '视频流传输超时(10s)', // kTCDXcastStreamTimeout
+      80024: 'iOS锁屏', // kTCDiOSScreenLock
+      80025: 'iOS ReplayKit 意外停止', // kTCDReplayKitStop
+      80031: 'Windows 锁屏', // kTCDWinLock
+      80033: '无首帧，倒计时退出', // kTCDNoFirstFrameExit
+      80052: '重连后发现对端断开', // kTCDUserChangeAfterReconnect
+      80054: '被抢投退出', // kTCDExitByGrabbed
     };
 
     if (table.containsKey(code)) {

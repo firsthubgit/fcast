@@ -154,16 +154,16 @@
   [_channel invokeMethod:@"extendModeChanged" arguments:@(extendMode)];
 }
 
-- (void)onNetStateChanged:(BOOL)disconnected {
-  [_channel invokeMethod:@"netStateChanged" arguments:@(disconnected)];
-}
-
 - (void)onRecoveryNotify:(TCDRecoveryInfo *)info {
   [_channel invokeMethod:@"recover" arguments:info.receiverTCDUID];
 }
 
 - (void)onRecoveryComplete:(TCDError)code info:(TCDRecoveryInfo *)info {
   [_channel invokeMethod:@"recovered" arguments:@(code)];
+}
+
+- (void)onNetStateChanged:(BOOL)disconnected {
+  [_channel invokeMethod:@"netStateChanged" arguments:@(disconnected)];
 }
 
 - (void)onNetworkCheckProgress:(NSString *)url
@@ -178,6 +178,9 @@
 }
 
 - (void)onTipsUpdate:(NSString *)tips {
+  // 这类消息太多了，屏蔽掉
+  if ([tips containsString:@"wecast version"])
+      return;
   [_channel invokeMethod:@"tip" arguments:tips];
 }
 
@@ -186,7 +189,7 @@
 }
 
 - (void)onStreamInfoUpdated {
-  [_channel invokeMethod:@"stream" arguments:nil];
+  [_channel invokeMethod:@"streaming" arguments:nil];
 }
 
 @end

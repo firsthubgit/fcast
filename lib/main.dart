@@ -128,8 +128,28 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _startCast() {
-    if (_wecast != null && textController.value.text.length == 6)
-      _wecast.startCast(textController.value.text).then((_) {});
+    if (!_hasPermission) {
+      // macos，每次构建完毕运行都没有权限，只有第二次运行才有
+      Wecast.queryPermission().then((res) {
+        setState(() {
+          _hasPermission = res;
+        });
+      });
+      return;
+    }
+
+    assert(_wecast != null);
+    if (_castState != CastState.stateCasting) {
+      if (textController.value.text.length == 6)
+        _wecast.startCast(textController.value.text).then((_) {
+          // castStateChanged 回调并不是那么及时，可以先补救一下
+          setState(() {
+            _castState = CastState.stateCasting;
+          });
+        });
+    } else {
+      _wecast.stopCast().then((_) {});
+    }
   }
 
   @override
@@ -147,7 +167,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 : Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Text('方正投屏 $_hasPermission',
+                      Text('方正投屏 $_hasPermission $_castState',
                           style: Theme.of(context)
                               .textTheme
                               .display1
