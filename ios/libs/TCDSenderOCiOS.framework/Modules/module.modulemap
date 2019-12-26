@@ -1,0 +1,6 @@
+framework module TCDSenderOCiOS {
+  umbrella header "TCDSenderOCiOS.h"
+
+  export *
+  module * { export * }
+}

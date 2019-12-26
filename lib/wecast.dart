@@ -67,6 +67,7 @@ class Wecast {
         'corpAuth': genCorpAuth(setting),
         'privateUrl': setting.privateUrl,
         'nickName': setting.nickName,
+        'mirror': setting.mirror,
       });
     }
     return _instance;
