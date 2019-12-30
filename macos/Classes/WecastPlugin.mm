@@ -81,14 +81,20 @@
   } else if ([@"startNetCheck" isEqualToString:call.method]) {
     [_sender startCheckNetwork];
     result(nil);
+  } else if ([@"stopNetCheck" isEqualToString:call.method]) {
+    [_sender stopCheckNetwork];
+    result(nil);
   } else {
     result(FlutterMethodNotImplemented);
   }
 }
 
 - (BOOL)queryPermission {
-  CGDisplayStreamRef stream = CGDisplayStreamCreate(CGMainDisplayID(), 1, 1, kCVPixelFormatType_32BGRA, nil, ^(CGDisplayStreamFrameStatus status, uint64_t displayTime, IOSurfaceRef frameSurface, CGDisplayStreamUpdateRef updateRef) {
-  });
+  CGDisplayStreamRef stream = CGDisplayStreamCreate(
+      CGMainDisplayID(), 1, 1, kCVPixelFormatType_32BGRA, nil,
+      ^(CGDisplayStreamFrameStatus status, uint64_t displayTime,
+        IOSurfaceRef frameSurface, CGDisplayStreamUpdateRef updateRef){
+      });
   if (stream) {
     CFRelease(stream);
     return YES;
@@ -99,30 +105,29 @@
   // https://stackoverflow.com/a/57379206/620672
   // not worked
   if (@available(macOS 10.15, *)) {
-      CFArrayRef windowList = CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly, kCGNullWindowID);
-      NSUInteger numberOfWindows = CFArrayGetCount(windowList);
-      NSUInteger numberOfWindowsWithName = 0;
-      for (int idx = 0; idx < numberOfWindows; idx++) {
-          NSDictionary *windowInfo = (NSDictionary *)CFArrayGetValueAtIndex(windowList, idx);
-          NSString *windowName = windowInfo[(id)kCGWindowName];
-          if (windowName) {
-              numberOfWindowsWithName++;
-          } else {
-              // no kCGWindowName detected -> not enabled
-              break; //breaking early, numberOfWindowsWithName not increased
-          }
-
+    CFArrayRef windowList = CGWindowListCopyWindowInfo(
+        kCGWindowListOptionOnScreenOnly, kCGNullWindowID);
+    NSUInteger numberOfWindows = CFArrayGetCount(windowList);
+    NSUInteger numberOfWindowsWithName = 0;
+    for (int idx = 0; idx < numberOfWindows; idx++) {
+      NSDictionary *windowInfo =
+          (NSDictionary *)CFArrayGetValueAtIndex(windowList, idx);
+      NSString *windowName = windowInfo[(id)kCGWindowName];
+      if (windowName) {
+        numberOfWindowsWithName++;
+      } else {
+        // no kCGWindowName detected -> not enabled
+        break;  // breaking early, numberOfWindowsWithName not increased
       }
-      CFRelease(windowList);
-      return numberOfWindows == numberOfWindowsWithName;
+    }
+    CFRelease(windowList);
+    return numberOfWindows == numberOfWindowsWithName;
   }
   return YES;
 }
 
-
 - (void)onEngineStarted:(TCDError)code userInfo:(TCDUser *)selfInfo {
-  [_channel invokeMethod:@"engineStarted"
-               arguments:@(code)];
+  [_channel invokeMethod:@"engineStarted" arguments:@(code)];
 }
 
 - (void)onCastStarted:(TCDError)code {
@@ -136,7 +141,7 @@
 - (void)onUserChanged:(TCDUserChangeType)changeType
            changeList:(NSMutableArray<TCDUser *> *)changeList
             totalList:(NSMutableArray<TCDUser *> *)totalList {
-   [_channel invokeMethod:@"userChanged" arguments:nil];
+  [_channel invokeMethod:@"userChanged" arguments:nil];
 }
 
 - (void)onCastAdded:(TCDError)code config:(TCDCastConfig *)config {
@@ -171,7 +176,12 @@
                    description:(NSString *)description
                       progress:(int)progress
                      totalSize:(int)totalSize {
-  [_channel invokeMethod:@"netCheck" arguments:description];
+  [_channel invokeMethod:@"netCheck"
+               arguments:@{
+                 @"description" : description,
+                 @"progress" : @(progress),
+                 @"total" : @(totalSize),
+               }];
 }
 
 - (void)onNetworkCheckFinish:(NSMutableArray<TCDPingTask *> *)item {
@@ -181,7 +191,7 @@
 - (void)onTipsUpdate:(NSString *)tips {
   // 这类消息太多了，屏蔽掉
   if ([tips containsString:@"wecast version"])
-      return;
+    return;
   [_channel invokeMethod:@"tip" arguments:tips];
 }
 

@@ -7,7 +7,7 @@ class MainFlutterWindow: NSWindow {
     let flutterViewController = FlutterViewController.init()
     var windowFrame = self.frame
     
-    windowFrame.size = NSSize(width:400, height:367)
+    windowFrame.size = NSSize(width:400, height:400)
     
     super.styleMask.remove(NSWindow.StyleMask.resizable)
     // super.styleMask.remove(NSWindow.StyleMask.titled)

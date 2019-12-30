@@ -39,6 +39,7 @@ enum CastState {
 
 typedef ErrorHandle = void Function(int, String);
 typedef StateChange = void Function(CastState);
+typedef NetCheckCallback = void Function(String, dynamic);
 
 class Wecast {
   static Future<String> get platformVersion async {
@@ -108,10 +109,18 @@ class Wecast {
   }
 
   ///
-  Future startNetCheck() async {
+  NetCheckCallback _netCheckCallback;
+  Future startNetCheck(NetCheckCallback netCheckCallback) async {
+    _netCheckCallback = netCheckCallback;
     await _channel.invokeMethod<void>('startNetCheck');
   }
 
+  Future stopNetCheck() async {
+    await _channel.invokeMethod<void>('stopNetCheck');
+    _netCheckCallback = null;
+  }
+
+  ///
   Future shutdown() async {
     await _channel.invokeMethod<void>('shutdown');
     _channel.setMethodCallHandler(null);
@@ -135,16 +144,22 @@ class Wecast {
       errorHandle(method.arguments, error(method.arguments));
     }
 
+    // state
     final List stateMethod = <String>['castStateChanged'];
 
-    // if (method.method == 'castStarted')
-    //   _state = CastState.stateCasting;
-    // else if (method.method == 'castStopped')
-    //   _state = CastState.stateNone;
-    // else
     if (stateMethod.contains(method.method)) {
       _state = method.arguments;
       stateChange(_state);
+    }
+
+    // network check
+    final List netMethod = <String>[
+      'netCheck',
+      'netChecked',
+      'netStateChanged'
+    ];
+    if (_netCheckCallback != null && netMethod.contains(method.method)) {
+      _netCheckCallback(method.method, method.arguments);
     }
   }
 

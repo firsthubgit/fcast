@@ -6,8 +6,10 @@ import 'package:flutter/foundation.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:menubar/menubar.dart';
+import 'package:flutter/cupertino.dart';
 
 import 'wecast.dart';
+import 'network_check_page.dart';
 
 void main() {
   // See https://github.com/flutter/flutter/wiki/Desktop-shells#target-platform-override
@@ -91,13 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (Platform.isMacOS) {
       setApplicationMenu([
         Submenu(label: "工具", children: [
-          MenuItem(
-              label: "网络检测",
-              onClicked: () async {
-                if (_wecast != null) {
-                  await _wecast.startNetCheck();
-                }
-              }),
+          MenuItem(label: "网络诊断", onClicked: _startNetCheck),
         ])
       ]).then((_) {});
     }
@@ -158,10 +154,27 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  void _startNetCheck() {
+    Navigator.of(context).push(CupertinoPageRoute<void>(
+      title: "诊断网络",
+      builder: (BuildContext context) => NetworkCheckPage(wecast: _wecast),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.blue[900],
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text("方正投屏"),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.network_check, semanticLabel: '网络诊断'),
+            onPressed: _startNetCheck,
+          )
+        ],
+      ),
       body: Center(
         child:
             // !_hasPermission
@@ -173,7 +186,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 : Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Text('方正投屏 $_hasPermission $_castState',
+                      Text(
+                          ' $_hasPermission ${_castState.toString().substring(10)}',
                           style: Theme.of(context)
                               .textTheme
                               .display1
