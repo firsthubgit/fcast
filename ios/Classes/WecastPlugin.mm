@@ -4,7 +4,6 @@
 
 #import "TCDSenderOCiOS/TCDDefine.h"
 
-
 @implementation WecastPlugin {
   TCDEngineSender *_sender;
   FlutterMethodChannel *_channel;
@@ -80,27 +79,31 @@
   } else if ([@"startNetCheck" isEqualToString:call.method]) {
     [_sender startCheckNetwork];
     result(nil);
+  } else if ([@"stopNetCheck" isEqualToString:call.method]) {
+    [_sender stopCheckNetwork];
+    result(nil);
   } else {
     result(FlutterMethodNotImplemented);
   }
 }
 
 - (BOOL)queryPermission {
-//  if (@available(macOS 10.15, *)) {
-//      CGDisplayStreamRef stream = CGDisplayStreamCreate(CGMainDisplayID(), 1, 1, kCVPixelFormatType_32BGRA, nil, ^(CGDisplayStreamFrameStatus status, uint64_t displayTime, IOSurfaceRef frameSurface, CGDisplayStreamUpdateRef updateRef) {
-//      });
-//      if (stream) {
-//          CFRelease(stream);
-//          return YES;
-//      }
-//  }
+  //  if (@available(macOS 10.15, *)) {
+  //      CGDisplayStreamRef stream = CGDisplayStreamCreate(CGMainDisplayID(),
+  //      1, 1, kCVPixelFormatType_32BGRA, nil, ^(CGDisplayStreamFrameStatus
+  //      status, uint64_t displayTime, IOSurfaceRef frameSurface,
+  //      CGDisplayStreamUpdateRef updateRef) {
+  //      });
+  //      if (stream) {
+  //          CFRelease(stream);
+  //          return YES;
+  //      }
+  //  }
   return NO;
 }
 
-
 - (void)onEngineStarted:(TCDError)code userInfo:(TCDUser *)selfInfo {
-  [_channel invokeMethod:@"engineStarted"
-               arguments:@(code)];
+  [_channel invokeMethod:@"engineStarted" arguments:@(code)];
 }
 
 - (void)onCastStarted:(TCDError)code {
@@ -114,6 +117,7 @@
 - (void)onUserChanged:(TCDUserChangeType)changeType
            changeList:(NSMutableArray<TCDUser *> *)changeList
             totalList:(NSMutableArray<TCDUser *> *)totalList {
+  [_channel invokeMethod:@"userChanged" arguments:nil];
 }
 
 - (void)onCastAdded:(TCDError)code config:(TCDCastConfig *)config {
@@ -132,10 +136,6 @@
   [_channel invokeMethod:@"extendModeChanged" arguments:@(extendMode)];
 }
 
-- (void)onNetStateChanged:(BOOL)disconnected {
-  [_channel invokeMethod:@"netStateChanged" arguments:@(disconnected)];
-}
-
 - (void)onRecoveryNotify:(TCDRecoveryInfo *)info {
   [_channel invokeMethod:@"recover" arguments:info.receiverTCDUID];
 }
@@ -144,11 +144,19 @@
   [_channel invokeMethod:@"recovered" arguments:@(code)];
 }
 
+- (void)onNetStateChanged:(BOOL)disconnected {
+  [_channel invokeMethod:@"netStateChanged" arguments:@(disconnected)];
+}
+
 - (void)onNetworkCheckProgress:(NSString *)url
                    description:(NSString *)description
                       progress:(int)progress
                      totalSize:(int)totalSize {
-  [_channel invokeMethod:@"netCheck" arguments:description];
+  [_channel invokeMethod:@"netCheck" arguments:@{
+                 @"description" : description,
+                 @"progress" : @(progress),
+                 @"total" : @(totalSize),
+               }];
 }
 
 - (void)onNetworkCheckFinish:(NSMutableArray<TCDPingTask *> *)item {
@@ -156,6 +164,9 @@
 }
 
 - (void)onTipsUpdate:(NSString *)tips {
+  // 这类消息太多了，屏蔽掉
+  if ([tips containsString:@"wecast version"])
+    return;
   [_channel invokeMethod:@"tip" arguments:tips];
 }
 
@@ -164,7 +175,7 @@
 }
 
 - (void)onStreamInfoUpdated {
-  [_channel invokeMethod:@"stream" arguments:nil];
+  [_channel invokeMethod:@"streaming" arguments:nil];
 }
 
 @end
