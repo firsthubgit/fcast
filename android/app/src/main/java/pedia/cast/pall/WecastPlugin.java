@@ -68,6 +68,8 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
     if (!inited) {
       inited = true;
 
+      sender.init(registrar.context());
+
       sender.setListener(new SenderListener(channel));
     }
 
@@ -86,11 +88,11 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
       result.success(null);
     } else if (call.method.equals("init")) {
       TCDAbilityConfig abilityConfig = new TCDAbilityConfig();
-      abilityConfig.usingMirror = call.argument("mirror");
+      abilityConfig.usingMirror = (Boolean)call.argument("mirror");
       // sender.setAbilityConfig(abilityConfig);
 
       TCDPrivateConfig privateConfig = new TCDPrivateConfig();
-      privateConfig.url = call.argument("privateUrl");
+      privateConfig.url = (String)call.argument("privateUrl");
       sender.setPrivateConfig(privateConfig);
 
       TCDSenderConfig senderConfig = new TCDSenderConfig();
@@ -145,6 +147,7 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
 
   @Override
   public void onListen(Object arguments, EventSink events) {
+    Log.d(TAG, "onListen $arguments");
     // chargingStateChangeReceiver =
     // createChargingStateChangeReceiver(events);
     // registrar.context().registerReceiver(chargingStateChangeReceiver,
@@ -153,6 +156,7 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
 
   @Override
   public void onCancel(Object arguments) {
+    Log.d(TAG, "onCancel $arguments");
     // registrar.context().unregisterReceiver(chargingStateChangeReceiver);
     // chargingStateChangeReceiver = null;
   }
@@ -290,7 +294,6 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
             // TODO: save resultCode, data
             current.result.success(resultCode);
           }
-
           return true;
       }
       return false;

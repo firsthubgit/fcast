@@ -60,5 +60,5 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
     // compile 'com.tencent.tcd:tcd-sender:2.2.4.51'
     // implementation 'com.tencent.tcd:tcd-sender:2.2.4.51'
-    implementation 'com.tencent.tcd:tcd-sender:2.2.6.38'
+    implementation 'com.tencent.tcd:tcd-sender:2.2.4.51'
 }

@@ -204,6 +204,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           inputFormatters: [
                             WhitelistingTextInputFormatter.digitsOnly,
                           ],
+                          keyboardType: TextInputType.number,
                         ),
                       ),
 
