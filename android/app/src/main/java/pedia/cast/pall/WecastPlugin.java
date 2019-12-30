@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.projection.MediaProjectionManager;
 import android.util.Log;
-import androidx.core.content.ContextCompat;
+
 import com.tencent.tcd.bean.PingTask;
 import com.tencent.tcd.bean.TCDAbilityConfig;
 import com.tencent.tcd.bean.TCDPrivateConfig;
@@ -18,6 +18,12 @@ import com.tencent.tcd.sender.TCDEngineSender;
 import com.tencent.tcd.sender.TCDRecoveryInfo;
 import com.tencent.tcd.sender.TCDSenderConfig;
 import com.tencent.tcd.sender.TCDSenderListener;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import androidx.core.content.ContextCompat;
 import io.flutter.plugin.common.EventChannel.EventSink;
 import io.flutter.plugin.common.EventChannel.StreamHandler;
 import io.flutter.plugin.common.MethodCall;
@@ -25,9 +31,6 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * WecastPlugin
@@ -66,15 +69,15 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
     if (!inited) {
       inited = true;
 
+      // init tcd.so ...
       sender.init(registrar.context());
 
+      // event
       sender.setListener(new SenderListener(channel));
     }
 
     if (call.method.equals("getPlatformVersion")) {
-      // result(
-      //     [@"macOS " stringByAppendingString:[[NSProcessInfo processInfo]
-      //                                            operatingSystemVersionString]]);
+      result.success(3.2);
     } else if (call.method.equals("queryPermission")) {
       if (hasPermission())
         result.success(true);
@@ -107,11 +110,13 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
       config.pin = (String) call.arguments;
 
       if (delegate.capturePermissionData != null) {
+        // startCast directly
         TCDCastPermissionInfo info = new TCDCastPermissionInfo();
         info.permissionCode = delegate.capturePermissionCode;
         info.permissionData = delegate.capturePermissionData;
         sender.startCast(config, info);
-      } else { // call Delegate
+      } else { 
+        // call Delegate
         delegate.current = new Current(
             REQUEST_MEDIA_PROJECTION, result, "cast", sender, config);
         startCast();
@@ -131,15 +136,19 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
         info.permissionCode = delegate.capturePermissionCode;
         info.permissionData = delegate.capturePermissionData;
         sender.recoveryCast(recovery, info);
-      } else { // call Delegate
+      } else { 
+        // call Delegate
         delegate.current = new Current(
-            REQUEST_MEDIA_PROJECTION, result, "cast", sender, config);
+            REQUEST_MEDIA_PROJECTION, result, "recover", sender, config);
         startCast();
       }
 
       result.success(null);
     } else if (call.method.equals("startNetCheck")) {
       sender.startCheckNetwork();
+      result.success(null);
+    } else if (call.method.equals("stopNetCheck")) {
+      sender.stopCheckNetwork();
       result.success(null);
     } else {
       result.notImplemented();
@@ -149,17 +158,17 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
   boolean hasPermission() {
     Activity activity = registrar.activity();
     return ContextCompat.checkSelfPermission(
-               activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        == PackageManager.PERMISSION_GRANTED
-        && ContextCompat.checkSelfPermission(
-               activity, Manifest.permission.INTERNET)
-        == PackageManager.PERMISSION_GRANTED;
+        activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+               == PackageManager.PERMISSION_GRANTED
+               && ContextCompat.checkSelfPermission(
+        activity, Manifest.permission.INTERNET)
+                      == PackageManager.PERMISSION_GRANTED;
   }
 
   void queryPermission() {
     Activity activity = registrar.activity();
     ActivityCompat.requestPermissions(activity,
-        new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.INTERNET},
         REQUEST_MEDIA_PROJECTION);
   }
@@ -298,7 +307,7 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
     private TCDCastConfig castConfig;
 
     Current(int request, Result result, String action, TCDEngineSender sender,
-        TCDCastConfig castConfig) {
+            TCDCastConfig castConfig) {
       this.request = request;
       this.result = result;
       this.action = action;
@@ -333,7 +342,6 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
           return true;
         }
 
-        // TODO: save resultCode, data
         capturePermissionCode = resultCode;
         capturePermissionData = data;
 
@@ -343,7 +351,7 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
           TCDCastPermissionInfo info = new TCDCastPermissionInfo();
           info.permissionCode = capturePermissionCode;
           info.permissionData = capturePermissionData;
-          // TODO: resume
+          // TODO: recovery
           current.sender.startCast(current.castConfig, info);
         }
         return true;
