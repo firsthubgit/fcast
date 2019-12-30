@@ -88,17 +88,19 @@ class _MyHomePageState extends State<MyHomePage> {
     });
 
     // menu
-    setApplicationMenu([
-      Submenu(label: "工具", children: [
-        MenuItem(
-            label: "网络检测",
-            onClicked: () async {
-              if (_wecast != null) {
-                await _wecast.startNetCheck();
-              }
-            }),
-      ])
-    ]).then((_) {});
+    if (Platform.isMacOS) {
+      setApplicationMenu([
+        Submenu(label: "工具", children: [
+          MenuItem(
+              label: "网络检测",
+              onClicked: () async {
+                if (_wecast != null) {
+                  await _wecast.startNetCheck();
+                }
+              }),
+        ])
+      ]).then((_) {});
+    }
 
     Wecast.init(
         Setting(

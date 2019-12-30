@@ -136,6 +136,7 @@
 - (void)onUserChanged:(TCDUserChangeType)changeType
            changeList:(NSMutableArray<TCDUser *> *)changeList
             totalList:(NSMutableArray<TCDUser *> *)totalList {
+   [_channel invokeMethod:@"userChanged" arguments:nil];
 }
 
 - (void)onCastAdded:(TCDError)code config:(TCDCastConfig *)config {
