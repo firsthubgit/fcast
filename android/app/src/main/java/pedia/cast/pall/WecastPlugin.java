@@ -2,8 +2,10 @@ package pedia.cast.pall;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.projection.MediaProjectionManager;
 import android.util.Log;
 
 import com.tencent.tcd.bean.PingTask;
@@ -21,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import io.flutter.plugin.common.EventChannel.EventSink;
 import io.flutter.plugin.common.EventChannel.StreamHandler;
@@ -81,18 +82,20 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
       if (hasPermission())
         result.success(true);
       else {
-        queryPermission(result);
+        delegate.current =
+            new Current(REQUEST_MEDIA_PROJECTION, result, null, null, null);
+        queryPermission();
       }
     } else if (call.method.equals("shutdown")) {
       sender.stopTCDEngine();
       result.success(null);
     } else if (call.method.equals("init")) {
       TCDAbilityConfig abilityConfig = new TCDAbilityConfig();
-      abilityConfig.usingMirror = (Boolean)call.argument("mirror");
-      // sender.setAbilityConfig(abilityConfig);
+      abilityConfig.usingMirror = (Boolean) call.argument("mirror");
+      sender.setAbilityConfig(abilityConfig);
 
       TCDPrivateConfig privateConfig = new TCDPrivateConfig();
-      privateConfig.url = (String)call.argument("privateUrl");
+      privateConfig.url = (String) call.argument("privateUrl");
       sender.setPrivateConfig(privateConfig);
 
       TCDSenderConfig senderConfig = new TCDSenderConfig();
@@ -104,10 +107,18 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
       result.success(null);
     } else if (call.method.equals("startCast")) {
       TCDCastConfig config = new TCDCastConfig();
-      config.pin = call.toString();
-      // TODO: permissionCode
-      sender.startCast(config, new TCDCastPermissionInfo());
-      result.success(null);
+      config.pin = (String) call.arguments;
+
+      if (delegate.capturePermissionData != null) {
+        TCDCastPermissionInfo info = new TCDCastPermissionInfo();
+        info.permissionCode = delegate.capturePermissionCode;
+        info.permissionData = delegate.capturePermissionData;
+        sender.startCast(config, info);
+      } else { // call Delegate
+        delegate.current = new Current(
+            REQUEST_MEDIA_PROJECTION, result, "cast", sender, config);
+        queryPermission();
+      }
     } else if (call.method.equals("stopCast")) {
       sender.stopCast();
       result.success(null);
@@ -135,19 +146,25 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
                       == PackageManager.PERMISSION_GRANTED;
   }
 
-  void queryPermission(Result result) {
-    delegate.current = new Current(REQUEST_MEDIA_PROJECTION, result);
-
+  void queryPermission() {
     Activity activity = registrar.activity();
-    ActivityCompat.requestPermissions(activity,
-        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.INTERNET},
-        REQUEST_MEDIA_PROJECTION);
+    MediaProjectionManager manager =
+        (MediaProjectionManager) activity.getSystemService(
+            Context.MEDIA_PROJECTION_SERVICE);
+
+    activity.startActivityForResult(
+        manager.createScreenCaptureIntent(), REQUEST_MEDIA_PROJECTION);
+
+    // Activity activity = registrar.activity();
+    // ActivityCompat.requestPermissions(activity,
+    //     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+    //         Manifest.permission.INTERNET},
+    //     REQUEST_MEDIA_PROJECTION);
   }
 
   @Override
   public void onListen(Object arguments, EventSink events) {
-    Log.d(TAG, "onListen $arguments");
+    Log.d(TAG, "onListen " + arguments);
     // chargingStateChangeReceiver =
     // createChargingStateChangeReceiver(events);
     // registrar.context().registerReceiver(chargingStateChangeReceiver,
@@ -156,7 +173,7 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
 
   @Override
   public void onCancel(Object arguments) {
-    Log.d(TAG, "onCancel $arguments");
+    Log.d(TAG, "onCancel " + arguments);
     // registrar.context().unregisterReceiver(chargingStateChangeReceiver);
     // chargingStateChangeReceiver = null;
   }
@@ -169,8 +186,9 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
     }
 
     public void onEngineStarted(int errorCode, TCDUser selfInfo) {
-      Log.d(
-          TAG, "onEngineStarted errorCode = $errorCode, selfInfo = $selfInfo");
+      Log.d(TAG,
+          "onEngineStarted errorCode: " + errorCode
+              + ", selfInfo: " + selfInfo);
       this.channel.invokeMethod("engineStarted", errorCode);
     }
 
@@ -182,50 +200,53 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
     public void onUserChanged(
         int changeType, List<TCDUser> changeList, List<TCDUser> totalList) {
       Log.d(TAG,
-          "onUserChanged changeType = $changeType, changeList = $changeList, totalList = $totalList");
+          "onUserChanged changeType: " + changeType
+              + ", changeList: " + changeList + ", totalList: " + totalList);
       channel.invokeMethod("userChanged", null);
     }
 
     public void onCastStopped(int reason) {
-      Log.d(TAG, "onCastStopped reason = $reason");
+      Log.d(TAG, "onCastStopped reason: " + reason);
       channel.invokeMethod("castStopped", reason);
     }
 
     public void onCastStarted(int retCode) {
-      Log.d(TAG, "onCastStarted retCode = $retCode");
+      Log.d(TAG, "onCastStarted retCode: " + retCode);
       channel.invokeMethod("castStarted", retCode);
     }
 
     public void onCastAdded(int retCode, TCDCastConfig config) {
-      Log.d(TAG, "onCastAdded retCode = $retCode, config = $config");
+      Log.d(TAG, "onCastAdded retCode: " + retCode + ", config: " + config);
       channel.invokeMethod("castAdded", retCode);
     }
 
     public void onCastStateChanged(int retCode, int castState) {
-      Log.d(
-          TAG, "onCastStateChanged retCode = $retCode,castState = $castState");
+      Log.d(TAG,
+          "onCastStateChanged retCode: " + retCode
+              + ", castState: " + castState);
       channel.invokeMethod("castStateChanged", castState);
     }
 
     public void onRecoveryNotify(TCDRecoveryInfo info) {
-      Log.d(TAG, "onRecoveryNotify info = $info");
+      Log.d(TAG, "onRecoveryNotify info: " + info);
       channel.invokeMethod("recover", info.receiverTcdUId);
     }
 
     public void onRecoveryCompleted(int retCode, TCDRecoveryInfo info) {
-      Log.d(TAG, "onRecoveryCompleted retCode = $retCode, info = $info");
+      Log.d(TAG, "onRecoveryCompleted retCode: " + retCode + ", info: " + info);
       channel.invokeMethod("recovered", retCode);
     }
 
     public void onNetStateChanged(boolean disconnected) {
-      Log.d(TAG, "onNetStateChanged disconnected = $disconnected");
+      Log.d(TAG, "onNetStateChanged disconnected: " + disconnected);
       channel.invokeMethod("netStateChanged", disconnected);
     }
 
     public void onNetworkCheckProgress(
         String url, String description, int progress, int totalSize) {
       Log.d(TAG,
-          "onNetworkCheckProgress url = $url,description = $description, progress = $progress, totalSize = $totalSize");
+          "onNetworkCheckProgress url: " + url + ", description: " + description
+              + ", progress: " + progress + ", totalSize: " + totalSize);
 
       Map<String, Object> args = new HashMap<>();
       args.put("url", url);
@@ -237,7 +258,7 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
     }
 
     public void onNetworkCheckFinished(List<PingTask> items) {
-      Log.d(TAG, "onNetworkCheckFinished items = $items");
+      Log.d(TAG, "onNetworkCheckFinished items: " + items);
       channel.invokeMethod("netChecked", null);
     }
 
@@ -260,10 +281,17 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
   public static final class Current {
     public int request;
     public Result result;
+    public String action;
+    private TCDEngineSender sender;
+    private TCDCastConfig castConfig;
 
-    Current(int request, Result result) {
+    Current(int request, Result result, String action, TCDEngineSender sender,
+            TCDCastConfig castConfig) {
       this.request = request;
       this.result = result;
+      this.action = action;
+      this.sender = sender;
+      this.castConfig = castConfig;
     }
   }
 
@@ -272,29 +300,39 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
     private boolean pendingOperation = false;
 
     public Current current;
-
-    void reply(Object object, int expectRequest) {
-      if (current != null && expectRequest == current.request)
-        current.result.success(object);
-
-      current = null;
-    }
+    public int capturePermissionCode = 0;
+    public Intent capturePermissionData = null;
 
     @Override
     public boolean onActivityResult(
         int requestCode, int resultCode, Intent data) {
       if (pendingOperation)
         return false;
-      switch (requestCode) {
-        case REQUEST_MEDIA_PROJECTION:
-          if (resultCode != Activity.RESULT_OK) {
-            // TODO: check current
-            current.result.error("ScreenCaptureAccess", "TODO", null);
-          } else {
-            // TODO: save resultCode, data
-            current.result.success(resultCode);
-          }
+
+      Log.d(TAG,
+          "onActiveResult request: " + requestCode + " result: " + resultCode
+              + " data: " + data);
+
+      if (requestCode == REQUEST_MEDIA_PROJECTION) {
+        if (resultCode != Activity.RESULT_OK) {
+          // TODO: check current
+          current.result.error("ScreenCaptureAccess", "TODO", null);
           return true;
+        }
+
+        // TODO: save resultCode, data
+        capturePermissionCode = resultCode;
+        capturePermissionData = data;
+
+        if (current != null) {
+          current.result.success(resultCode);
+
+          TCDCastPermissionInfo info = new TCDCastPermissionInfo();
+          info.permissionCode = capturePermissionCode;
+          info.permissionData = capturePermissionData;
+          current.sender.startCast(current.castConfig, info);
+        }
+        return true;
       }
       return false;
     }

@@ -32,7 +32,7 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        // Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "pedia.cast.pall"
         minSdkVersion 21
         targetSdkVersion 28
@@ -58,7 +58,12 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    // compile => implementation 似乎是新版 gradle 语法
     // compile 'com.tencent.tcd:tcd-sender:2.2.4.51'
-    // implementation 'com.tencent.tcd:tcd-sender:2.2.4.51'
+
+    // 官方建议稳定版
     implementation 'com.tencent.tcd:tcd-sender:2.2.4.51'
+
+    // newest
+    // implementation 'com.tencent.tcd:tcd-sender:2.2.6.38'
 }

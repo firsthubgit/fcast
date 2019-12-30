@@ -151,6 +151,10 @@ class _MyHomePageState extends State<MyHomePage> {
         });
     } else {
       _wecast.stopCast().then((_) {});
+
+      setState(() {
+        _castState = CastState.stateNone;
+      });
     }
   }
 
