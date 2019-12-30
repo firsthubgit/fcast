@@ -168,12 +168,12 @@ class Wecast {
       301: '错误pin码',
       80009: '心跳超时', // kTCDExitTimeout
       80010: '邀请失败或超时退出', // kTCDExitByInviteFailed
-      80017: 'tv主动断开', // kTCDTvExit
-      80018: 'tv邀请超时(5s)', // kTCDTVNotEnter
+      80017: 'Tv主动断开', // kTCDTvExit
+      80018: 'Tv邀请超时(5s)', // kTCDTVNotEnter
       80021: '合盖子退出', // kTCDBookCover
       80022: 'app被终止', // kTCDTerminateApp
       80023: '视频流传输超时(10s)', // kTCDXcastStreamTimeout
-      80024: 'iOS锁屏', // kTCDiOSScreenLock
+      80024: 'iOS 锁屏', // kTCDiOSScreenLock
       80025: 'iOS ReplayKit 意外停止', // kTCDReplayKitStop
       80031: 'Windows 锁屏', // kTCDWinLock
       80033: '无首帧，倒计时退出', // kTCDNoFirstFrameExit
