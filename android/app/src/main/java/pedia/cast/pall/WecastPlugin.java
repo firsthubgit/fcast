@@ -8,6 +8,8 @@ import android.content.pm.PackageManager;
 import android.media.projection.MediaProjectionManager;
 import android.util.Log;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import com.tencent.tcd.bean.PingTask;
 import com.tencent.tcd.bean.TCDAbilityConfig;
 import com.tencent.tcd.bean.TCDPrivateConfig;
@@ -18,12 +20,6 @@ import com.tencent.tcd.sender.TCDEngineSender;
 import com.tencent.tcd.sender.TCDRecoveryInfo;
 import com.tencent.tcd.sender.TCDSenderConfig;
 import com.tencent.tcd.sender.TCDSenderListener;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import androidx.core.content.ContextCompat;
 import io.flutter.plugin.common.EventChannel.EventSink;
 import io.flutter.plugin.common.EventChannel.StreamHandler;
 import io.flutter.plugin.common.MethodCall;
@@ -31,9 +27,13 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * WecastPlugin
+ * TODO: base from FlutterPlugin, ActivityAware
  */
 public class WecastPlugin implements MethodCallHandler, StreamHandler {
   private final PluginRegistry.Registrar registrar;
@@ -115,7 +115,7 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
         info.permissionCode = delegate.capturePermissionCode;
         info.permissionData = delegate.capturePermissionData;
         sender.startCast(config, info);
-      } else { 
+      } else {
         // call Delegate
         delegate.current = new Current(
             REQUEST_MEDIA_PROJECTION, result, "cast", sender, config);
@@ -131,15 +131,16 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
       if (delegate.capturePermissionData != null) {
         TCDRecoveryInfo recovery = new TCDRecoveryInfo();
         // recovery.
+        // TODO:
 
         TCDCastPermissionInfo info = new TCDCastPermissionInfo();
         info.permissionCode = delegate.capturePermissionCode;
         info.permissionData = delegate.capturePermissionData;
         sender.recoveryCast(recovery, info);
-      } else { 
+      } else {
         // call Delegate
         delegate.current = new Current(
-            REQUEST_MEDIA_PROJECTION, result, "recover", sender, config);
+            REQUEST_MEDIA_PROJECTION, result, "recover", sender, null);
         startCast();
       }
 
@@ -150,6 +151,9 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
     } else if (call.method.equals("stopNetCheck")) {
       sender.stopCheckNetwork();
       result.success(null);
+    } else if (call.method.equals("updateAuth")) {
+      sender.updateAuthInfo((String) call.arguments);
+      result.success(null);
     } else {
       result.notImplemented();
     }
@@ -158,17 +162,17 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
   boolean hasPermission() {
     Activity activity = registrar.activity();
     return ContextCompat.checkSelfPermission(
-        activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-               == PackageManager.PERMISSION_GRANTED
-               && ContextCompat.checkSelfPermission(
-        activity, Manifest.permission.INTERNET)
-                      == PackageManager.PERMISSION_GRANTED;
+               activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        == PackageManager.PERMISSION_GRANTED
+        && ContextCompat.checkSelfPermission(
+               activity, Manifest.permission.INTERNET)
+        == PackageManager.PERMISSION_GRANTED;
   }
 
   void queryPermission() {
     Activity activity = registrar.activity();
     ActivityCompat.requestPermissions(activity,
-        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.INTERNET},
         REQUEST_MEDIA_PROJECTION);
   }
@@ -214,7 +218,6 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
     }
 
     public void onAuthInfoExpired() {
-      Log.d(TAG, "onAuthInfoExpired");
       channel.invokeMethod("authExpired", null);
     }
 
@@ -307,7 +310,7 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
     private TCDCastConfig castConfig;
 
     Current(int request, Result result, String action, TCDEngineSender sender,
-            TCDCastConfig castConfig) {
+        TCDCastConfig castConfig) {
       this.request = request;
       this.result = result;
       this.action = action;

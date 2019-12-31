@@ -82,6 +82,9 @@
   } else if ([@"stopNetCheck" isEqualToString:call.method]) {
     [_sender stopCheckNetwork];
     result(nil);
+  } else if ([@"updateAuth" isEqualToString:call.method]) {
+    [_sender updateAuthInfo:call.arguments];
+    result(nil);
   } else {
     result(FlutterMethodNotImplemented);
   }

@@ -60,7 +60,7 @@ class Wecast {
   ) async {
     assert(_instance == null);
     if (_instance == null) {
-      _instance = Wecast._(errorHandle, stateChange);
+      _instance = Wecast._(errorHandle, stateChange, setting);
 
       _channel.invokeMethod<void>('init', {
         'extendScreen': setting.extendScreen,
@@ -82,12 +82,13 @@ class Wecast {
     });
   }
 
-  Wecast._(this.errorHandle, this.stateChange) {
+  Wecast._(this.errorHandle, this.stateChange, this.setting) {
     _channel.setMethodCallHandler(_callback);
   }
 
   final ErrorHandle errorHandle;
   final StateChange stateChange;
+  final Setting setting;
 
   CastState _state = CastState.stateNone;
   CastState get state => _state;
@@ -160,6 +161,11 @@ class Wecast {
     ];
     if (_netCheckCallback != null && netMethod.contains(method.method)) {
       _netCheckCallback(method.method, method.arguments);
+    }
+
+    // authExpired
+    if (method.method == 'authExpired') {
+      await _channel.invokeMethod<void>('updateAuth', genCorpAuth(setting));
     }
   }
 

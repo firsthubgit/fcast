@@ -84,6 +84,9 @@
   } else if ([@"stopNetCheck" isEqualToString:call.method]) {
     [_sender stopCheckNetwork];
     result(nil);
+  } else if ([@"updateAuth" isEqualToString:call.method]) {
+    [_sender updateAuthInfo:call.arguments];
+    result(nil);
   } else {
     result(FlutterMethodNotImplemented);
   }
@@ -176,8 +179,7 @@
                    description:(NSString *)description
                       progress:(int)progress
                      totalSize:(int)totalSize {
-  [_channel invokeMethod:@"netCheck"
-               arguments:@{
+  [_channel invokeMethod:@"netCheck" arguments:@{
                  @"description" : description,
                  @"progress" : @(progress),
                  @"total" : @(totalSize),
