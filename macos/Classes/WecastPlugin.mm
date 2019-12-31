@@ -179,16 +179,26 @@
                    description:(NSString *)description
                       progress:(int)progress
                      totalSize:(int)totalSize {
-  [_channel invokeMethod:@"netCheck" arguments:@{
+  [_channel invokeMethod:@"netCheck"
+               arguments:@{
                  @"description" : description,
                  @"progress" : @(progress),
                  @"total" : @(totalSize),
-                 @"url" : @(url),
+                 @"url" : url,
                }];
 }
 
 - (void)onNetworkCheckFinish:(NSMutableArray<TCDPingTask *> *)item {
-  [_channel invokeMethod:@"netChecked" arguments:nil];
+  NSMutableArray *arr = [[NSMutableArray alloc] init];
+  for (TCDPingTask *task in item) {
+    [arr addObject:@{
+      @"description" : task.urlDescription,
+      @"success" : @(task.successTimes),
+      @"total" : @(task.totalPingTimes),
+      @"url" : task.url
+    }];
+  }
+  [_channel invokeMethod:@"netChecked" arguments:arr];
 }
 
 - (void)onTipsUpdate:(NSString *)tips {

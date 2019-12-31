@@ -12,13 +12,15 @@ class NetworkCheckPage extends StatefulWidget {
 }
 
 class LogItem {
-  LogItem(this.description, this.url);
+  LogItem({this.description, this.url, this.success, this.total});
   final String description;
   final String url;
+  final int success;
+  final int total;
 }
 
 class _NetworkCheckPageState extends State<NetworkCheckPage> {
-  List items = <LogItem>[];
+  List<LogItem> items = <LogItem>[];
   int progress = 0;
   int total = 6;
 
@@ -31,11 +33,30 @@ class _NetworkCheckPageState extends State<NetworkCheckPage> {
         if (arguments is Map) {
           progress = arguments['progress'];
           total = arguments['total'];
-          items.add(LogItem(arguments['description'], arguments['url']));
+          items.add(
+            LogItem(
+              description: arguments['description'],
+              url: arguments['url'],
+            ),
+          );
 
           if (mounted) {
             setState(() {});
           }
+        }
+      } else if (method == "netChecked") {
+        print('netChecked: $arguments');
+        if (arguments is List) {
+          setState(() {
+            for (int i = 0; i < arguments.length; ++i) {
+              items[i] = LogItem(
+                description: arguments[i]['description'],
+                url: arguments[i]['url'],
+                total: arguments[i]['total'],
+                success: arguments[i]['success'],
+              );
+            }
+          });
         }
       }
     }).then((_) {});
@@ -62,24 +83,31 @@ class _NetworkCheckPageState extends State<NetworkCheckPage> {
           ),
         ],
       ),
-      body: ListView.builder(
-          itemCount: items.length,
-          itemBuilder: (BuildContext context, int i) {
-            return ListTile(
-              dense: true,
-              title: Text(items[i].description,
-                  style: Theme.of(context)
-                      .textTheme
-                      .body1
-                      .apply(color: Colors.white)),
-              subtitle: Text(items[i].url,
-                  style: Theme.of(context)
-                      .textTheme
-                      .caption
-                      .apply(color: Colors.grey)),
-              trailing: Icon(Icons.check, color: Colors.green),
-            );
-          }),
+      body: Scrollbar(
+        child: ListView.builder(
+            itemCount: items.length,
+            itemBuilder: (BuildContext context, int i) {
+              final LogItem item = items[i];
+              return ListTile(
+                dense: true,
+                title: Text(item.description,
+                    style: Theme.of(context)
+                        .textTheme
+                        .body1
+                        .apply(color: Colors.white)),
+                subtitle: Text(item.url,
+                    style: Theme.of(context)
+                        .textTheme
+                        .caption
+                        .apply(color: Colors.grey)),
+                trailing: item.success == null
+                    ? Icon(Icons.more_horiz, color: Colors.grey)
+                    : item.success == item.total
+                        ? Icon(Icons.check, color: Colors.green)
+                        : Icon(Icons.error, color: Colors.red),
+              );
+            }),
+      ),
     );
   }
 }
