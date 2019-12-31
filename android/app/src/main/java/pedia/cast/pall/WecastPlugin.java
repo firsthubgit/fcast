@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.projection.MediaProjectionManager;
 import android.util.Log;
-
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import com.tencent.tcd.bean.PingTask;
@@ -27,6 +26,9 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -282,8 +284,17 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
     }
 
     public void onNetworkCheckFinished(List<PingTask> items) {
-      Log.d(TAG, "onNetworkCheckFinished items: " + items);
-      channel.invokeMethod("netChecked", null);
+      List<Map<String, Object>> arr = new ArrayList<Map<String, Object>>();
+      for (PingTask a : items) {
+        Map<String, Object> args = new HashMap<>();
+        args.put("url", a.url);
+        args.put("description", a.description);
+        args.put("success", a.successTime);
+        args.put("total", a.totalPingTime);
+        arr.add(args);
+      }
+
+      channel.invokeMethod("netChecked", arr);
     }
 
     public void onTipsUpdated(String content) {

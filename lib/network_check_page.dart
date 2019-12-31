@@ -45,7 +45,7 @@ class _NetworkCheckPageState extends State<NetworkCheckPage> {
           }
         }
       } else if (method == "netChecked") {
-        print('netChecked: $arguments');
+        // print('netChecked: $arguments');
         if (arguments is List) {
           setState(() {
             for (int i = 0; i < arguments.length; ++i) {

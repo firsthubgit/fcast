@@ -164,7 +164,16 @@
 }
 
 - (void)onNetworkCheckFinish:(NSMutableArray<TCDPingTask *> *)item {
-  [_channel invokeMethod:@"netChecked" arguments:nil];
+  NSMutableArray *arr = [[NSMutableArray alloc] init];
+  for (TCDPingTask *task in item) {
+    [arr addObject:@{
+      @"description" : task.urlDescription,
+      @"success" : @(task.successTimes),
+      @"total" : @(task.totalPingTimes),
+      @"url" : task.url
+    }];
+  }
+  [_channel invokeMethod:@"netChecked" arguments:arr];
 }
 
 - (void)onTipsUpdate:(NSString *)tips {
