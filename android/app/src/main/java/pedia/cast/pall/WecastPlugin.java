@@ -276,7 +276,7 @@ public class WecastPlugin implements MethodCallHandler, StreamHandler {
       args.put("url", url);
       args.put("description", description);
       args.put("progress", progress);
-      args.put("totalSize", totalSize);
+      args.put("total", totalSize);
 
       channel.invokeMethod("netCheck", args);
     }

@@ -12,7 +12,7 @@ public class MainActivity extends FlutterActivity {
     GeneratedPluginRegistrant.registerWith(flutterEngine);
 
     ShimPluginRegistry shimPluginRegistry = new ShimPluginRegistry(flutterEngine);
-    // WecastPlugin.registerWith(shimPluginRegistry.registrarFor("wecast"));
-    FakePlugin.registerWith(shimPluginRegistry.registrarFor("wecast"));
+    WecastPlugin.registerWith(shimPluginRegistry.registrarFor("wecast"));
+    // FakePlugin.registerWith(shimPluginRegistry.registrarFor("wecast"));
   }
 }

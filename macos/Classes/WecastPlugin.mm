@@ -183,6 +183,7 @@
                  @"description" : description,
                  @"progress" : @(progress),
                  @"total" : @(totalSize),
+                 @"url" : @(url),
                }];
 }
 

@@ -163,7 +163,7 @@ class Wecast {
       _netCheckCallback(method.method, method.arguments);
     }
 
-    // authExpired
+    // handle authExpired
     if (method.method == 'authExpired') {
       await _channel.invokeMethod<void>('updateAuth', genCorpAuth(setting));
     }
