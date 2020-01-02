@@ -42,6 +42,7 @@
   } else if ([@"shutdown" isEqualToString:call.method]) {
     [_sender stopTCDEngine];
     _sender = nil;
+    result(nil);
   } else if ([@"init" isEqualToString:call.method]) {
     _sender = [[TCDEngineSender alloc] init];
     [_sender initTCDEngineSender];
