@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:menubar/menubar.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:device_info/device_info.dart';
 
 import 'wecast.dart';
 import 'network_check_page.dart';
@@ -50,7 +51,8 @@ const String kPublicKey = "-----BEGIN PUBLIC KEY-----\n"
     "JZkFRWQIONBaInx0vwIDAQAB\n"
     "-----END PUBLIC KEY-----";
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage>
+    with SingleTickerProviderStateMixin {
   bool _hasPermission = false;
   Wecast _wecast;
   // last error string
@@ -71,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
 
-    initPlugin();
+    initPlugin().then((_) {});
   }
 
   @override
@@ -82,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
-  void initPlugin() {
+  Future initPlugin() async {
     Wecast.queryPermission().then((res) {
       setState(() {
         _hasPermission = res;
@@ -98,30 +100,40 @@ class _MyHomePageState extends State<MyHomePage> {
       ]).then((_) {});
     }
 
+    //
+    String name = 'pall';
+    if (Platform.isAndroid) {
+      name = (await DeviceInfoPlugin().androidInfo).host;
+    } else if (Platform.isIOS) {
+      name = (await DeviceInfoPlugin().iosInfo).name;
+    }
+
     Wecast.init(
-        Setting(
-          privateUrl: 'http://117.122.223.243',
-          corpId: '1497349707',
-          publicKey: kPublicKey,
-          nickName: 'fpall', // TODO: mac/ip or hostname
-        ), (int code, String error) {
-      if (mounted)
+      setting: Setting(
+        privateUrl: 'http://117.122.223.243',
+        corpId: '1497349707',
+        publicKey: kPublicKey,
+        nickName: name,
+      ),
+      errorHandle: (int code, String error) {
         setState(() {
           _code = code;
           _error = error;
         });
-    }, (state) {
-      setState(() {
-        _castState = state;
-      });
-    }).then((instance) {
+      },
+      stateChange: (state) {
+        print('ui got state: $state');
+        setState(() {
+          _castState = state;
+        });
+      },
+    ).then((instance) {
       _wecast = instance;
     }).catchError((error, stackTrac) {
-      if (mounted)
-        setState(() {
-          _code = -1;
-          _error = error.toString();
-        });
+      setState(() {
+        _code = -1;
+        _error = error.toString();
+      });
     });
   }
 
@@ -141,16 +153,18 @@ class _MyHomePageState extends State<MyHomePage> {
       if (textController.value.text.length == 6)
         _wecast.startCast(textController.value.text).then((_) {
           // castStateChanged 回调并不是那么及时，可以先补救一下
-          setState(() {
-            _castState = CastState.stateCasting;
-          });
+          // setState(() {
+          //   _castState = CastState.stateCasting;
+          // });
         });
     } else {
-      _wecast.stopCast().then((_) {});
-
-      setState(() {
-        _castState = CastState.stateNone;
+      _wecast.stopCast().then((_) {
+        textController.text = '';
       });
+
+      // setState(() {
+      //   _castState = CastState.stateNone;
+      // });
     }
   }
 
@@ -163,11 +177,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final display1 =
+        Theme.of(context).textTheme.display1.apply(color: Colors.white70);
+
     return Scaffold(
       backgroundColor: Colors.blue[900],
       appBar: AppBar(
         centerTitle: true,
-        title: Text("方正投屏"),
+        // (${_castState.toString().substring(10)})
+        title: Text("方正投屏 - 信息中心"),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.network_check, semanticLabel: '网络诊断'),
@@ -181,50 +199,50 @@ class _MyHomePageState extends State<MyHomePage> {
             // ? Text('检查录屏权限', style: Theme.of(context).textTheme.display1)
             // :
             _wecast == null
-                ? Text('正在连接服务器...',
-                    style: Theme.of(context).textTheme.display1)
+                ? Text('正在连接服务器...', style: display1)
                 : Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Text(
-                          ' $_hasPermission ${_castState.toString().substring(10)}',
-                          style: Theme.of(context)
-                              .textTheme
-                              .display1
-                              .apply(color: Colors.white70)),
+                      _hasPermission
+                          ? _castState == CastState.stateCasting
+                              ? Text('投屏中...', style: display1)
+                              : Text('请输入投屏码', style: display1)
+                          : Text('没有足够权限', style: display1),
                       SizedBox(height: 20),
-                      //
-                      Container(
-                        width: 300, //
-                        child: TextField(
-                          autofocus: true,
-                          showCursor: true,
-                          controller: textController,
-                          maxLength: 6,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context)
-                              .textTheme
-                              .display3
-                              .copyWith(color: Colors.white, letterSpacing: 12),
-                          decoration: InputDecoration(
-                            border: const UnderlineInputBorder(),
-                            // hintText: '投屏码(数字)',
-                            // helperText: 'Hello',
-                            counterText: '',
-                            hintStyle: Theme.of(context)
+
+                      if (_castState != CastState.stateCasting)
+                        Container(
+                          width: 300, //
+                          child: TextField(
+                            autofocus: true,
+                            showCursor: true,
+                            controller: textController,
+                            maxLength: 6,
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context)
                                 .textTheme
-                                .caption
-                                .apply(fontSizeDelta: 10),
+                                .display3
+                                .copyWith(
+                                    color: Colors.white, letterSpacing: 12),
+                            decoration: InputDecoration(
+                              border: const UnderlineInputBorder(),
+                              // hintText: '投屏码(数字)',
+                              // helperText: 'Hello',
+                              counterText: '',
+                              hintStyle: Theme.of(context)
+                                  .textTheme
+                                  .caption
+                                  .apply(fontSizeDelta: 10),
+                            ),
+                            onSubmitted: (_) {
+                              _startCast();
+                            },
+                            inputFormatters: [
+                              WhitelistingTextInputFormatter.digitsOnly,
+                            ],
+                            keyboardType: TextInputType.number,
                           ),
-                          onSubmitted: (_) {
-                            _startCast();
-                          },
-                          inputFormatters: [
-                            WhitelistingTextInputFormatter.digitsOnly,
-                          ],
-                          keyboardType: TextInputType.number,
                         ),
-                      ),
 
                       SizedBox(height: 40),
                       //

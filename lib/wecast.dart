@@ -9,7 +9,7 @@ class Setting {
     this.publicKey,
     this.captureAudio: false,
     this.extendScreen: true,
-    this.mirror: false,
+    this.mirror: true,
     this.corpId,
     this.nickName,
     this.privateUrl,
@@ -17,11 +17,13 @@ class Setting {
         assert(corpId != null),
         assert(nickName != null),
         assert(privateUrl != null),
-        assert(extendScreen != mirror);
+        assert(mirror);
 
   final String publicKey;
   final bool captureAudio;
   final bool extendScreen;
+
+  /// 只在 Android 端出现，必须设置为 True，否则不会有视频流
   final bool mirror;
   final String corpId;
   final String nickName;
@@ -53,12 +55,14 @@ class Wecast {
   static const MethodChannel _channel = const MethodChannel('wecast');
   static Wecast _instance;
 
-  static Future<Wecast> init(
+  static Future<Wecast> init({
     Setting setting,
     ErrorHandle errorHandle,
     StateChange stateChange,
-  ) async {
+  }) async {
     assert(_instance == null);
+    assert(stateChange != null);
+
     if (_instance == null) {
       _instance = Wecast._(errorHandle, stateChange, setting);
 
@@ -145,12 +149,19 @@ class Wecast {
       errorHandle(method.arguments, error(method.arguments));
     }
 
-    // state
+    // state 并不完整，这里补救
+    if ('castStarted' == method.method) {
+      CastState state =
+          method.arguments != 0 ? CastState.stateNone : CastState.stateCasting;
+      stateChange(state);
+    }
+    if ('castStopped' == method.method) {
+      stateChange(CastState.stateNone);
+    }
     final List stateMethod = <String>['castStateChanged'];
 
     if (stateMethod.contains(method.method)) {
-      _state = method.arguments;
-      stateChange(_state);
+      setState(CastState.values[method.arguments]);
     }
 
     // network check
@@ -169,6 +180,11 @@ class Wecast {
     }
   }
 
+  void setState(CastState state) {
+    _state = state;
+    if (stateChange != null) stateChange(state);
+  }
+
   static String error(int code) {
     final Map<int, String> table = {
       0: '成功',
@@ -177,15 +193,15 @@ class Wecast {
       101: '网络异常',
       102: '授权验证失败',
       103: 'sdk版本被禁用',
-      104: '错误参数',
-      105: '错误状态',
+      104: '参数错误',
+      105: '状态错误',
       106: '音视频模块失败',
       107: '信令异常',
       108: '发送端接收端能力不匹配无法互通',
       110: 'cdkey无效',
       111: 'cdkey欠费',
       201: '建立投屏连接超时',
-      202: '操作错误次数过多被限制',
+      202: '操作错误次数过多，部分功能被限制',
       301: '错误pin码',
       80009: '心跳超时', // kTCDExitTimeout
       80010: '邀请失败或超时退出', // kTCDExitByInviteFailed
