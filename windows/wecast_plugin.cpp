@@ -13,9 +13,8 @@
 // #error Not Support x86
 // #endif
 
-// #define TCDEXPORT
-#include "tcd/tcd_engine_def.h"
-#include "tcd/tcd_engine_sender.h"
+
+#include "adapter.h"
 
 namespace {
 
@@ -38,11 +37,13 @@ class WecastPlugin : public flutter::Plugin {
   // The MethodChannel used for communication with the Flutter engine.
   std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel_;
 
-  tcd::TCDEngineSender* sender_;
+  // tcd::TCDEngineSender* sender_;
 };
 
 // static
 void WecastPlugin::RegisterWithRegistrar(flutter::PluginRegistrar *registrar) {
+  foo();
+
   auto channel =
       std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
           registrar->messenger(), "wecast",
@@ -61,7 +62,7 @@ void WecastPlugin::RegisterWithRegistrar(flutter::PluginRegistrar *registrar) {
 
 WecastPlugin::WecastPlugin(
     std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> channel)
-    : channel_(std::move(channel)), sender_(0) {}
+    : channel_(std::move(channel))/*, sender_(0)*/ {}
 
 WecastPlugin::~WecastPlugin(){};
 
@@ -69,9 +70,9 @@ void WecastPlugin::HandleMethodCall(
     const flutter::MethodCall<flutter::EncodableValue> &method_call,
     std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result) {
 
-  if (sender_ == 0) {
-    sender_ = tcd::GetTCDSenderEngine();
-  }
+  // if (sender_ == 0) {
+  //   sender_ = tcd::GetTCDSenderEngine();
+  // }
 
   if (method_call.method_name().compare("getPlatformVersion") == 0) {
     std::ostringstream version_stream;

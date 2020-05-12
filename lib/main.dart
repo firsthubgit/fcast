@@ -110,7 +110,8 @@ class _MyHomePageState extends State<MyHomePage>
 
     Wecast.init(
       setting: Setting(
-        privateUrl: 'http://117.122.223.243',
+        privateUrl: 'http://10.150.108.105',
+        // privateUrl: 'http://117.122.223.243',
         corpId: '1497349707',
         publicKey: kPublicKey,
         nickName: name,
